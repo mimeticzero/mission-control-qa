@@ -4,7 +4,7 @@ import { TestTable } from './TestTable'
 
 export const metadata: Metadata = {
   title:       'QA Results — Mission Control QA Stack',
-  description: '207 Playwright tests · K6 500 VU · Lighthouse 98/100 · OWASP ZAP 0 High — full QA observability for the Mission Control GCS demo.',
+  description: '291 Playwright tests · 4 mission profiles · K6 500 VU · Lighthouse 98/100 · OWASP ZAP 0 High — full QA observability for the Mission Control GCS demo.',
 }
 
 const C = {
@@ -29,7 +29,7 @@ const FEATURES = [
   { id: '03', title: 'Datalink Monitoring',     desc: 'Real-time latency, RSSI, and packet-loss metrics with visual degradation indicators, history bar chart, and EW mode stress-test.' },
   { id: '04', title: 'Mission Timeline',        desc: 'Append-only event log with severity levels. Every waypoint, command, and anomaly is timestamped and categorised.' },
   { id: '05', title: 'QA-Ready Architecture',  desc: 'Deterministic simulator core, typed command bus, isolated Zustand store — built from the ground up for E2E, load, and security testing.' },
-  { id: '06', title: 'Full Test Coverage',      desc: '207 Playwright tests across Chromium · Firefox · WebKit. K6 load: p95=198ms, 0% fail. Lighthouse: Perf 98, A11y 100.' },
+  { id: '06', title: 'Full Test Coverage',      desc: '291 Playwright tests across Chromium · Firefox · WebKit — including 4-profile matrix (Aerial · Ground · Maritime · UGV). K6 load: p95=198ms, 0% fail. Lighthouse: Perf 98, A11y 100.' },
 ]
 
 const STACK = [
@@ -39,7 +39,7 @@ const STACK = [
   { name: 'react-leaflet', desc: 'Open-source mapping, no API key' },
   { name: 'Recharts',      desc: 'Real-time telemetry graphs' },
   { name: 'Zustand',       desc: 'Lightweight reactive state' },
-  { name: 'Playwright',    desc: '207 tests — 3 browsers' },
+  { name: 'Playwright',    desc: '291 tests — 3 browsers' },
   { name: 'K6',            desc: 'Load: 500 VU, 0% fail rate' },
 ]
 
@@ -126,7 +126,7 @@ export default function QAPage() {
 
         {/* ── 4 KEY METRICS ── */}
         <div className="qa-grid-4" style={{ marginBottom: '32px' }}>
-          <StatCard value="207"   label="Playwright tests" sub="100% pass · 3 browsers"       accent={C.cyan}   tooltip="207 E2E tests: 69 scenarios x Chromium, Firefox, WebKit on Ubuntu. All pass with 0 failures." />
+          <StatCard value="291"   label="Playwright tests" sub="100% pass · 3 browsers"       accent={C.cyan}   tooltip="291 E2E tests: 97 scenarios x Chromium, Firefox, WebKit on Ubuntu — including 4-profile matrix. All pass with 0 failures." />
           <StatCard value="198ms" label="K6 p95 latency"   sub="500 VU · 0% fail · 210.9 rps" accent={C.purple} tooltip="p95 = 95th-percentile latency: 95% of requests completed in under 198ms under 500 concurrent virtual users." />
           <StatCard value="98"    label="Lighthouse perf"  sub="A11y 100 · SEO 92 · BP 100"   accent={C.amber}  tooltip="Google Lighthouse performance score out of 100. Audits FCP, LCP, TBT, CLS, and Speed Index. 98 = excellent." />
           <StatCard value="0"     label="ZAP high vulns"   sub="2 Medium · 6 Low · CSP active" accent={C.green}  tooltip="OWASP ZAP automated security scan: 0 High, 2 Medium, 6 Low severity findings. Content-Security-Policy active." />
@@ -137,19 +137,19 @@ export default function QAPage() {
           <SectionTitle color={C.cyan}>Playwright — E2E Test Suite</SectionTitle>
           <div className="qa-grid-2" style={{ marginBottom: '20px' }}>
             <div>
-              <Row label="Total tests"     value="207"       accent={C.cyan} />
+              <Row label="Total tests"     value="291"       accent={C.cyan} />
               <Row label="Pass rate"       value="100%"      accent={C.green} />
               <Row label="Failed"          value="0"         accent={C.green} />
-              <Row label="Suite duration"  value="2m 34s" />
-              <Row label="Parallelism"     value="3 workers" />
-              <Row label="Retries on fail" value="1" />
+              <Row label="Suite duration"  value="~6m 00s" />
+              <Row label="Parallelism"     value="4 workers" />
+              <Row label="Retries on fail" value="0" />
             </div>
             <div>
               <div style={{ fontSize: '12px', letterSpacing: '3px', color: C.tDim, marginBottom: '12px' }}>BROWSER BREAKDOWN</div>
               {[
-                { browser: 'Chromium', tests: 69, color: C.cyan },
-                { browser: 'Firefox',  tests: 69, color: C.purple },
-                { browser: 'WebKit',   tests: 69, color: C.amber },
+                { browser: 'Chromium', tests: 97, color: C.cyan },
+                { browser: 'Firefox',  tests: 97, color: C.purple },
+                { browser: 'WebKit',   tests: 97, color: C.amber },
               ].map(({ browser, tests, color }) => (
                 <div key={browser} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 0', borderBottom: `1px solid ${C.border}` }}>
                   <span style={{ fontSize: '13px', color: C.tMut, width: '80px', flexShrink: 0 }}>{browser}</span>
@@ -171,6 +171,7 @@ export default function QAPage() {
               { cat: 'Accessibility (a11y)', count: '32', color: C.purple },
               { cat: 'Datalink monitoring',  count: '36', color: C.cyan },
               { cat: 'Navigation & layout',  count: '29', color: C.tMut },
+              { cat: 'Multi-profile',        count: '84', color: C.pink },
             ].map(({ cat, count, color }) => (
               <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'rgba(255,255,255,0.02)', border: `1px solid ${C.border}` }}>
                 <span style={{ fontSize: '12px', color: C.tSec }}>{cat}</span>
@@ -181,6 +182,73 @@ export default function QAPage() {
 
           {/* ── TEST SCENARIO TABLE ── */}
           <TestTable />
+        </SectionBox>
+
+        {/* ── MULTI-PROFILE COVERAGE ── */}
+        <SectionBox accent={C.pink}>
+          <SectionTitle color={C.pink}>Multi-Profile Coverage — 4 Operational Contexts</SectionTitle>
+          <p style={{ fontSize: '13px', color: C.tSec, lineHeight: 1.7, marginBottom: '20px', maxWidth: '700px' }}>
+            The same GCS framework is validated across four distinct operational theatres. Switching profiles reloads the fleet, updates telemetry labels, resets the map centre, and replaces vehicle callsigns — all without changing the underlying architecture.
+          </p>
+          <div className="qa-grid-4" style={{ marginBottom: '20px' }}>
+            {[
+              {
+                emoji: '✈', label: 'Aerial Surveillance', profile: 'aerial',
+                vehicles: 'FALCON-1 · VIPER-2 · HAWK-3 · GHOST-4 · RAVEN-5',
+                area: 'Paris CDG — zoom 12',
+                energy: 'BATTERY', extra: 'ALT AGL · GND SPD',
+                tests: 9, color: C.cyan,
+              },
+              {
+                emoji: '🚛', label: 'Ground Convoy', profile: 'ground',
+                vehicles: 'SCOUT-1 · GUARDIAN-2 · SENTINEL-3 · RANGER-4 · NOMAD-5',
+                area: 'Satory / Versailles — zoom 14',
+                energy: 'FUEL', extra: 'SPD OVR GND · TIRE PSI',
+                tests: 9, color: C.amber,
+              },
+              {
+                emoji: '⚓', label: 'Maritime Patrol', profile: 'maritime',
+                vehicles: 'POSEIDON-1 · KRAKEN-2 · NEPTUNE-3 · TRITON-4 · NEREIDE-5',
+                area: 'Brest harbour — zoom 12',
+                energy: 'BATTERY', extra: 'DEPTH · WAVE HT · CURRENT',
+                tests: 9, color: C.purple,
+              },
+              {
+                emoji: '🤖', label: 'UGV Recon', profile: 'ugv',
+                vehicles: 'MULE-1 · WOLF-2 · BEAR-3 · FOX-4 · LYNX-5',
+                area: 'Mourmelon — zoom 15',
+                energy: 'BATTERY', extra: 'ARMOR · CLRNCE · PAYLOAD',
+                tests: 9, color: C.green,
+              },
+            ].map(({ emoji, label, profile, vehicles, area, energy, extra, tests, color }) => (
+              <div key={profile} style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${color}33`, borderTop: `2px solid ${color}`, padding: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '18px' }}>{emoji}</span>
+                  <span style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '11px', letterSpacing: '2px', color, fontWeight: 700, textTransform: 'uppercase' as const }}>{label}</span>
+                </div>
+                <div style={{ fontSize: '12px', color: C.tMut, marginBottom: '6px', lineHeight: 1.7 }}>{vehicles}</div>
+                <div style={{ fontSize: '12px', color: C.tDim, marginBottom: '10px' }}>{area}</div>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' as const, marginBottom: '10px' }}>
+                  <span style={{ fontSize: '10px', letterSpacing: '1px', padding: '2px 7px', border: `1px solid ${color}44`, color }}>{energy}</span>
+                  {extra.split(' · ').map(tag => (
+                    <span key={tag} style={{ fontSize: '10px', letterSpacing: '1px', padding: '2px 7px', border: `1px solid ${C.border}`, color: C.tDim }}>{tag}</span>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '12px', color: C.tDim }}>Scenario coverage</span>
+                  <span style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '13px', color, fontWeight: 700 }}>{tests} × 3 = {tests * 3}</span>
+                </div>
+                <a href={`/demo?profile=${profile}`}
+                  style={{ display: 'block', textAlign: 'center', fontSize: '11px', letterSpacing: '2px', padding: '6px', border: `1px solid ${color}44`, color, textDecoration: 'none' }}>
+                  → Launch {profile.toUpperCase()} demo
+                </a>
+              </div>
+            ))}
+          </div>
+          <div style={{ padding: '12px 16px', background: `${C.pink}08`, border: `1px solid ${C.pink}22`, fontSize: '12px', color: C.tMut, lineHeight: 1.8 }}>
+            <span style={{ color: C.pink, fontWeight: 700 }}>28 new scenarios</span> × 3 browsers = <span style={{ color: C.pink, fontWeight: 700 }}>84 tests</span> &nbsp;·&nbsp;
+            Profile selector · URL permalink · vehicle callsigns · telemetry labels · EW reset on switch · timeline events
+          </div>
         </SectionBox>
 
         {/* ── K6 LOAD ── */}

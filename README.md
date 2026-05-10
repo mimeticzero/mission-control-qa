@@ -72,13 +72,26 @@ tests/
 
 ### E2E scenarios (Playwright)
 
-69 scenarios x 3 browsers (Chromium, Firefox, WebKit) on Ubuntu = 207 tests.
+97 scenarios × 3 browsers (Chromium, Firefox, WebKit) on Ubuntu = **291 tests**.
 
 - User dispatches `RTH`: drone heading changes on map within 2 s
 - User dispatches `EMERGENCY_LAND`: `CRITICAL` event appears in timeline
 - Battery drops below 15 %: status badge turns red, alert logged
 - Datalink latency spike: latency bar chart updates, no UI freeze
 - Command `TIMEOUT`: console shows error, command status shows `FAILED`
+
+#### Multi-profile matrix (28 new scenarios)
+
+The framework supports four operational profiles switchable at runtime via a dropdown or `?profile=` URL param:
+
+| Profile   | Fleet callsigns                                       | Area               | Extra metrics        |
+|-----------|-------------------------------------------------------|--------------------|----------------------|
+| `aerial`  | FALCON-1 · VIPER-2 · HAWK-3 · GHOST-4 · RAVEN-5      | Paris CDG, zoom 12 | ALT AGL, GND SPD     |
+| `ground`  | SCOUT-1 · GUARDIAN-2 · SENTINEL-3 · RANGER-4 · NOMAD-5 | Satory/Versailles, zoom 14 | SPD OVR GND, FUEL, TIRE PSI |
+| `maritime`| POSEIDON-1 · KRAKEN-2 · NEPTUNE-3 · TRITON-4 · NEREIDE-5 | Brest, zoom 12  | DEPTH, WAVE HT, CURRENT |
+| `ugv`     | MULE-1 · WOLF-2 · BEAR-3 · FOX-4 · LYNX-5            | Mourmelon, zoom 15 | ARMOR, CLRNCE, PAYLOAD |
+
+Profile switching resets the fleet, updates all telemetry labels, remounts the map at the new area centre, deactivates EW mode, and logs a `SYSTEM` event to the mission timeline. Architecture is unchanged — a single `mission-profiles.ts` registry drives all profile-aware components via the `activeProfile` Zustand key.
 
 ### Load scenarios (K6)
 
@@ -132,19 +145,24 @@ src/
       commands/route.ts     POST, command handler
   components/
     gcs/
-      MapView.tsx           Leaflet map with live drone
-      TelemetryPanel.tsx    Altitude, speed, battery + sparklines
-      DatalinkStatus.tsx    Latency, packet-loss, RSSI
-      CommandConsole.tsx    Terminal, RTH / HOLD / GOTO / EMRG
-      MissionTimeline.tsx   Append-only event log
+      MapView.tsx               Leaflet map, profile-aware vehicle icons
+      TelemetryPanel.tsx        Profile-specific metrics + sparklines
+      DatalinkStatus.tsx        Latency, packet-loss, RSSI
+      CommandConsole.tsx        Terminal, RTH / HOLD / GOTO / EMRG
+      MissionTimeline.tsx       Append-only event log
+      DroneSelector.tsx         Fleet tab strip, profile-aware callsigns
+      MissionProfileSelector.tsx Dropdown — aerial/ground/maritime/ugv
     ui/
-      Badge.tsx             Status badge (nominal/warning/critical)
-      StatusIndicator.tsx   Dot + label indicator
+      Badge.tsx                 Status badge (nominal/warning/critical)
+      StatusIndicator.tsx       Dot + label indicator
   lib/
-    types.ts                All TypeScript types
-    drone-simulator.ts      Client-side simulation engine
+    types.ts                All TypeScript types + MissionProfile + ProfileData
+    mission-profiles.ts     Central registry: fleet configs, map centres, labels
+    drone-simulator.ts      Client-side simulation engine (profile-aware)
+    fleet-simulator.ts      Multi-vehicle orchestrator (config-injected)
+    script-engine.ts        Scripted drama events (config-injected)
   store/
-    use-drone-store.ts      Zustand store, single source of truth
+    use-drone-store.ts      Zustand store — activeProfile, resetFleet
 
 tests/
   e2e/                      Playwright (Phase 2)

@@ -1,33 +1,37 @@
 'use client'
 
 /**
- * DroneSelector — horizontal strip of 5 tabs, one per fleet member.
- * Clicking a tab switches the active drone shown in the telemetry / command panels.
+ * DroneSelector — horizontal strip of vehicle tabs, one per fleet member.
+ * Profile-aware: uses the active profile's fleet config so callsigns update
+ * when the operator switches operational context.
  */
 
 import { useDroneStore } from '@/store/use-drone-store'
-import { FLEET_CONFIG } from '@/lib/fleet-config'
+import { MISSION_PROFILES } from '@/lib/mission-profiles'
 
 export function DroneSelector() {
-  const selectedId  = useDroneStore((s) => s.selectedDroneId)
-  const fleet       = useDroneStore((s) => s.fleet)
-  const selectDrone = useDroneStore((s) => s.selectDrone)
+  const selectedId    = useDroneStore((s) => s.selectedDroneId)
+  const fleet         = useDroneStore((s) => s.fleet)
+  const selectDrone   = useDroneStore((s) => s.selectDrone)
+  const activeProfile = useDroneStore((s) => s.activeProfile)
+
+  const fleetConfigs = MISSION_PROFILES[activeProfile].fleet
 
   return (
     <div
       data-testid="drone-selector"
       role="tablist"
-      aria-label="Select active drone"
+      aria-label="Select active vehicle"
       className="
         flex gap-px bg-gcs-border border-b border-gcs-border
         flex-shrink-0 overflow-x-auto
       "
     >
-      {FLEET_CONFIG.map((cfg) => {
-        const member    = fleet[cfg.id]
-        const battery   = member?.telemetry.battery ?? cfg.startBattery
+      {fleetConfigs.map((cfg) => {
+        const member     = fleet[cfg.id]
+        const battery    = member?.telemetry.battery ?? cfg.startBattery
         const isSelected = cfg.id === selectedId
-        const status    = member?.telemetry.status ?? 'NOMINAL'
+        const status     = member?.telemetry.status ?? 'NOMINAL'
 
         const batteryColor =
           battery < 15 ? '#ef4444' :
@@ -70,16 +74,16 @@ export function DroneSelector() {
               {cfg.callsign}
             </span>
 
-            {/* Battery */}
+            {/* Energy level */}
             <span
               className="font-mono tabular-nums"
               style={{ color: batteryColor }}
-              aria-label={`${battery.toFixed(0)} percent battery`}
+              aria-label={`${battery.toFixed(0)} percent energy`}
             >
               {battery.toFixed(0)}%
             </span>
 
-            {/* ID — use gcs-dim (#718096, 5.1:1 contrast) without opacity reduction */}
+            {/* ID */}
             <span className="text-gcs-dim">{cfg.id}</span>
           </button>
         )

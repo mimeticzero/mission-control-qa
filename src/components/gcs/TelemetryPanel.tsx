@@ -7,6 +7,7 @@ import {
 } from 'recharts'
 import { useDroneStore } from '@/store/use-drone-store'
 import { Badge } from '@/components/ui/Badge'
+import { MISSION_PROFILES } from '@/lib/mission-profiles'
 
 // ─── Mini sparkline chart ─────────────────────────────────────────────────────
 
@@ -99,21 +100,92 @@ function BatteryBar({ pct }: { pct: number }) {
   )
 }
 
+// ─── Profile-specific extra row ───────────────────────────────────────────────
+
+function ProfileExtraRow({ telemetry }: { telemetry: NonNullable<ReturnType<typeof useDroneStore.getState>['telemetry']> }) {
+  const profile = useDroneStore((s) => s.activeProfile)
+  const pd      = telemetry.profileData
+
+  if (profile === 'ground' && pd) {
+    return (
+      <div className="grid grid-cols-2 gap-px bg-gcs-border border-b border-gcs-border">
+        <div className="bg-gcs-panel p-2">
+          <DataCell label="TIRE PSI" value={pd.tirePressure?.toFixed(0) ?? '--'} unit="kPa" color="text-gcs-cyan" />
+        </div>
+        <div className="bg-gcs-panel p-2">
+          <DataCell label="FUEL" value={pd.fuelLevel?.toFixed(1) ?? '--'} unit="%" color="text-gcs-green"
+            warning={(pd.fuelLevel ?? 100) < 30}
+            critical={(pd.fuelLevel ?? 100) < 15}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  if (profile === 'maritime' && pd) {
+    return (
+      <div className="grid grid-cols-3 gap-px bg-gcs-border border-b border-gcs-border">
+        <div className="bg-gcs-panel p-2">
+          <DataCell label="DEPTH" value={pd.depth?.toFixed(0) ?? '0'} unit="m" color="text-gcs-cyan" />
+        </div>
+        <div className="bg-gcs-panel p-2">
+          <DataCell label="WAVE HT" value={pd.waveHeight?.toFixed(1) ?? '--'} unit="m" color="text-gcs-cyan" />
+        </div>
+        <div className="bg-gcs-panel p-2">
+          <DataCell label="CURRENT" value={pd.currentSpeed?.toFixed(2) ?? '--'} unit="m/s" color="text-gcs-cyan" />
+        </div>
+      </div>
+    )
+  }
+
+  if (profile === 'ugv' && pd) {
+    return (
+      <div className="grid grid-cols-3 gap-px bg-gcs-border border-b border-gcs-border">
+        <div className="bg-gcs-panel p-2">
+          <DataCell label="ARMOR" value={pd.armorIntegrity?.toFixed(0) ?? '--'} unit="%" color="text-gcs-green"
+            warning={(pd.armorIntegrity ?? 100) < 80}
+            critical={(pd.armorIntegrity ?? 100) < 60}
+          />
+        </div>
+        <div className="bg-gcs-panel p-2">
+          <DataCell label="CLRNCE" value={pd.clearance?.toFixed(0) ?? '--'} unit="cm" color="text-gcs-cyan" />
+        </div>
+        <div className="bg-gcs-panel p-2">
+          <div className="flex flex-col min-w-0">
+            <div className={`data-value text-[9px] tabular-nums ${
+              pd.payloadStatus === 'ACTIVE'  ? 'text-gcs-green' :
+              pd.payloadStatus === 'COOLING' ? 'text-gcs-yellow' : 'text-gcs-cyan'
+            }`}>
+              {pd.payloadStatus ?? 'READY'}
+            </div>
+            <div className="data-label">PAYLOAD</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return null
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function TelemetryPanel({ className = '' }: { className?: string }) {
-  const telemetry = useDroneStore((s) => s.telemetry)
-  const history   = useDroneStore((s) => s.history)
-  const ewMode    = useDroneStore((s) => s.ewMode)
+  const telemetry     = useDroneStore((s) => s.telemetry)
+  const history       = useDroneStore((s) => s.history)
+  const ewMode        = useDroneStore((s) => s.ewMode)
+  const activeProfile = useDroneStore((s) => s.activeProfile)
+
+  const profileMeta = MISSION_PROFILES[activeProfile]
 
   const chartData = useMemo(() =>
     history.slice(-60).map((h, i) => ({
       t:        i,
       altitude: Math.round(h.altitude),
-      speed:    parseFloat(h.speed.toFixed(1)),
+      speed:    parseFloat((h.speed * profileMeta.speedMultiplier).toFixed(1)),
       battery:  parseFloat(h.battery.toFixed(1)),
     })),
-    [history],
+    [history, profileMeta.speedMultiplier],
   )
 
   if (!telemetry) {
@@ -145,11 +217,54 @@ export function TelemetryPanel({ className = '' }: { className?: string }) {
     String(Math.floor((ft % 3600) / 60)).padStart(2, '0')}:${
     String(ft % 60).padStart(2, '0')}`
 
+  // Profile-specific primary metric 1 (altitude / depth / clearance / speed-over-ground)
+  const metric1 = (() => {
+    if (activeProfile === 'maritime') {
+      const depth = telemetry.profileData?.depth ?? 0
+      return { label: 'DEPTH', value: depth.toFixed(0), unit: 'm', testId: 'altitude-value' }
+    }
+    if (activeProfile === 'ugv') {
+      const clr = telemetry.profileData?.clearance ?? 0
+      return { label: 'CLRNCE', value: clr.toFixed(0), unit: 'cm', testId: 'altitude-value' }
+    }
+    // AERIAL: altitude AGL; GROUND: altitude is near 0, show speed in km/h instead
+    if (activeProfile === 'ground') {
+      return { label: 'SPD OVR GND', value: (speed * 3.6).toFixed(1), unit: 'km/h', testId: 'altitude-value' }
+    }
+    return { label: 'ALT AGL', value: String(Math.round(position.altitude)), unit: 'm', testId: 'altitude-value' }
+  })()
+
+  // Profile-specific primary metric 2 (speed)
+  const metric2 = (() => {
+    if (activeProfile === 'ground') {
+      return { label: 'HEADING', value: String(heading).padStart(3, '0'), unit: '°', testId: 'speed-value' }
+    }
+    if (activeProfile === 'maritime') {
+      return { label: 'SPD OVR WTR', value: (speed * 1.944).toFixed(1), unit: 'kn', testId: 'speed-value' }
+    }
+    return { label: 'GND SPD', value: speed.toFixed(1), unit: 'm/s', testId: 'speed-value' }
+  })()
+
+  // Profile-specific primary metric 3 (heading / extra)
+  const metric3 = (() => {
+    if (activeProfile === 'ground') {
+      const fuel = telemetry.profileData?.fuelLevel ?? battery
+      return { label: 'FUEL', value: fuel.toFixed(1), unit: '%', testId: 'heading-value' }
+    }
+    if (activeProfile === 'maritime') {
+      return { label: 'HEADING', value: String(heading).padStart(3, '0'), unit: '°', testId: 'heading-value' }
+    }
+    if (activeProfile === 'ugv') {
+      return { label: 'GND SPD', value: speed.toFixed(1), unit: 'm/s', testId: 'heading-value' }
+    }
+    return { label: 'HEADING', value: String(heading).padStart(3, '0'), unit: '°', testId: 'heading-value' }
+  })()
+
   return (
     <div
       data-testid="telemetry-panel"
       role="region"
-      aria-label="Drone telemetry data"
+      aria-label="Vehicle telemetry data"
       className={`panel flex flex-col overflow-hidden ${ewMode ? 'ew-active' : ''} ${className}`}
     >
       {/* Header */}
@@ -164,32 +279,32 @@ export function TelemetryPanel({ className = '' }: { className?: string }) {
       {/* Primary data grid */}
       <div className="grid grid-cols-3 gap-px bg-gcs-border border-b border-gcs-border">
         <div className="bg-gcs-panel p-2">
-          <div data-testid="altitude-value" aria-label={`Altitude ${Math.round(position.altitude)} meters`}>
-            <DataCell label="ALT AGL" value={Math.round(position.altitude)} unit="m" color="text-gcs-cyan" />
+          <div data-testid="altitude-value" aria-label={`${metric1.label} ${metric1.value} ${metric1.unit}`}>
+            <DataCell label={metric1.label} value={metric1.value} unit={metric1.unit} color="text-gcs-cyan" />
           </div>
         </div>
         <div className="bg-gcs-panel p-2">
-          <div data-testid="speed-value" aria-label={`Ground speed ${speed.toFixed(1)} meters per second`}>
-            <DataCell label="GND SPD" value={speed.toFixed(1)} unit="m/s" color="text-gcs-cyan" />
+          <div data-testid="speed-value" aria-label={`${metric2.label} ${metric2.value} ${metric2.unit}`}>
+            <DataCell label={metric2.label} value={metric2.value} unit={metric2.unit} color="text-gcs-cyan" />
           </div>
         </div>
         <div className="bg-gcs-panel p-2">
           <div data-testid="heading-value">
-            <DataCell label="HEADING" value={String(heading).padStart(3, '0')} unit="°" color="text-gcs-cyan" />
+            <DataCell label={metric3.label} value={metric3.value} unit={metric3.unit} color="text-gcs-cyan" />
           </div>
         </div>
       </div>
 
-      {/* Battery row */}
+      {/* Battery / fuel row */}
       <div className="px-2 pt-2 pb-1 border-b border-gcs-border">
         <div className="flex items-end justify-between mb-1">
           <div
             data-testid="battery-value"
-            aria-label={`Battery ${battery.toFixed(1)} percent${battery < 15 ? ' — CRITICAL' : battery < 30 ? ' — WARNING' : ''}`}
+            aria-label={`${profileMeta.energyLabel} ${battery.toFixed(1)} percent${battery < 15 ? ' — CRITICAL' : battery < 30 ? ' — WARNING' : ''}`}
             aria-live={battery < 15 ? 'assertive' : 'off'}
           >
             <DataCell
-              label="BATTERY"
+              label={profileMeta.energyLabel}
               value={battery.toFixed(1)}
               unit="%"
               color="text-gcs-green"
@@ -208,20 +323,22 @@ export function TelemetryPanel({ className = '' }: { className?: string }) {
         <BatteryBar pct={battery} />
       </div>
 
-      {/* Altitude sparkline */}
-      <div className="px-2 pt-1 border-b border-gcs-border">
-        <div className="data-label mb-0.5">ALTITUDE (last 30s)</div>
-        <Spark data={chartData} dataKey="altitude" color="#06b6d4" domain={[50, 200]} />
-      </div>
+      {/* Profile-specific extra row (tire pressure, wave height, armor, etc.) */}
+      <ProfileExtraRow telemetry={telemetry} />
 
-      {/* Speed + battery sparklines */}
+      {/* Altitude / speed sparklines */}
       <div className="grid grid-cols-2 gap-px bg-gcs-border border-b border-gcs-border">
         <div className="bg-gcs-panel px-2 pt-1 pb-1">
-          <div className="data-label mb-0.5">SPEED (m/s)</div>
-          <Spark data={chartData} dataKey="speed" color="#06b6d4" domain={[0, 20]} />
+          <div className="data-label mb-0.5">
+            {activeProfile === 'aerial' ? 'ALTITUDE (m)' :
+             activeProfile === 'ground' ? 'SPD (km/h)' :
+             activeProfile === 'maritime' ? 'SPD (kn)' : 'SPD (m/s)'}
+          </div>
+          <Spark data={chartData} dataKey={activeProfile === 'aerial' ? 'altitude' : 'speed'} color="#06b6d4"
+            domain={activeProfile === 'aerial' ? [50, 200] : [0, activeProfile === 'ground' ? 100 : 12]} />
         </div>
         <div className="bg-gcs-panel px-2 pt-1 pb-1">
-          <div className="data-label mb-0.5">BATTERY (%)</div>
+          <div className="data-label mb-0.5">{profileMeta.energyLabel} (%)</div>
           <Spark data={chartData} dataKey="battery" color="#22c55e" domain={[0, 100]} />
         </div>
       </div>
@@ -232,10 +349,10 @@ export function TelemetryPanel({ className = '' }: { className?: string }) {
           <DataCell label="SIGNAL" value={signalStrength} unit="%" color="text-gcs-cyan" />
         </div>
         <div className="bg-gcs-panel p-2">
-          <DataCell label="SATS"   value={satellites} color="text-gcs-cyan" />
+          <DataCell label="SATS" value={satellites} color="text-gcs-cyan" />
         </div>
         <div className="bg-gcs-panel p-2">
-          <DataCell label="HDOP"   value={gpsAccuracy.toFixed(1)} color="text-gcs-cyan" />
+          <DataCell label="HDOP" value={gpsAccuracy.toFixed(1)} color="text-gcs-cyan" />
         </div>
       </div>
 
@@ -244,8 +361,8 @@ export function TelemetryPanel({ className = '' }: { className?: string }) {
           <DataCell label="DIST HOME" value={distanceToHome} unit="m" color="text-gcs-dim" />
         </div>
         <div className="bg-gcs-panel p-2">
-          <div data-testid="flight-time" aria-label={`Flight time ${flightTimeStr}`}>
-            <DataCell label="FLT TIME" value={flightTimeStr} color="text-gcs-dim" />
+          <div data-testid="flight-time" aria-label={`Mission time ${flightTimeStr}`}>
+            <DataCell label="MSN TIME" value={flightTimeStr} color="text-gcs-dim" />
           </div>
         </div>
       </div>

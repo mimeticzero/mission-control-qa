@@ -102,11 +102,15 @@ export class DroneSim {
   private forcedDisconnectUntil = 0  // timestamp; datalink forced offline until then
   private ewMode = false
 
-  private readonly SPEED_MS = 10  // m/s nominal ground speed
+  // Profile-driven parameters (resolved from cfg at construction time)
+  private readonly SPEED_MS:         number
+  private readonly BATTERY_DRAIN_RATE: number
 
   constructor(private readonly cfg: DroneSimConfig) {
-    this.battery  = cfg.startBattery
-    this.wpIndex  = cfg.startWpIndex % cfg.patrolRoute.length
+    this.battery           = cfg.startBattery
+    this.wpIndex           = cfg.startWpIndex % cfg.patrolRoute.length
+    this.SPEED_MS          = cfg.nominalSpeedMs   ?? 10
+    this.BATTERY_DRAIN_RATE = cfg.batteryDrainRate ?? 0.056
   }
 
   // ── Public API (called by FleetSimulator or ScriptEngine) ─────────────────
@@ -114,7 +118,7 @@ export class DroneSim {
   /** Called once per 400 ms tick by FleetSimulator. Returns fresh telemetry. */
   tick(dtSec: number): TickResult {
     this.flightTime += dtSec
-    this.battery = Math.max(0, this.battery - dtSec * 0.056)
+    this.battery = Math.max(0, this.battery - dtSec * this.BATTERY_DRAIN_RATE)
 
     this.processPendingCommands()
 
@@ -288,7 +292,7 @@ export class DroneSim {
       position:       pos,
       speed:          this.overrideMode === 'HOLD'
                         ? 0
-                        : parseFloat((this.SPEED_MS + noise()).toFixed(1)),
+                        : parseFloat((this.SPEED_MS + noise() * 0.5).toFixed(1)),
       heading:        Math.round((this.lastHeading + 360) % 360),
       battery:        parseFloat(this.battery.toFixed(1)),
       batteryVoltage: parseFloat(
@@ -301,7 +305,37 @@ export class DroneSim {
       flightTime:     Math.round(this.flightTime),
       gpsAccuracy:    parseFloat((0.7 + Math.random() * 0.5).toFixed(1)),
       satellites:     Math.round(13 + Math.random() * 3),
+      profileData:    this.buildProfileData(),
     }
+  }
+
+  private buildProfileData(): import('./types').ProfileData | undefined {
+    const id = this.cfg.id
+    // Ground vehicles (GV-*)
+    if (id.startsWith('GV-')) {
+      return {
+        fuelLevel:    parseFloat(this.battery.toFixed(1)),  // fuel mirrors battery drain
+        tirePressure: parseFloat((235 + (Math.random() - 0.5) * 8).toFixed(1)),
+      }
+    }
+    // Maritime vessels (MV-*)
+    if (id.startsWith('MV-')) {
+      return {
+        depth:        0,   // surface patrol (all vessels in this demo)
+        waveHeight:   parseFloat((0.5 + Math.random() * 1.8).toFixed(1)),
+        currentSpeed: parseFloat((0.2 + Math.random() * 0.6).toFixed(2)),
+      }
+    }
+    // UGVs (UGV-*)
+    if (id.startsWith('UGV-')) {
+      const statuses: Array<'READY' | 'ACTIVE' | 'COOLING'> = ['READY', 'ACTIVE', 'COOLING']
+      return {
+        clearance:      parseFloat((20 + Math.random() * 25).toFixed(1)),
+        armorIntegrity: Math.max(70, Math.round(100 - (100 - this.battery) * 0.1)),
+        payloadStatus:  statuses[Math.floor(this.flightTime / 30) % 3],
+      }
+    }
+    return undefined
   }
 
   private buildDatalink(distHome: number): DataLink {

@@ -18,21 +18,22 @@ export default defineConfig({
   // Fail the build on CI if test.only is accidentally committed
   forbidOnly: !!process.env.CI,
 
-  // Retries: 1 on both CI and local — handles cross-browser timing flakiness
-  // without masking real failures (a test that fails twice is a real failure)
-  retries: 1,
+  // No retries — a flaky test that passes on retry masks a real problem.
+  // Fix the root cause; don't hide it behind retries.
+  retries: 0,
 
-  // Limit parallelism to prevent server overload when running all 3 browsers
-  // CI=2 keeps pipeline concurrency low; local=4 gives reasonable throughput
-  workers: process.env.CI ? 2 : 4,
+  // 4 workers in CI: with fullyParallel=true and no retries, this keeps
+  // total wall-clock time well under 10 minutes across 3 browser projects.
+  workers: process.env.CI ? 4 : 4,
 
   // Reporters
   reporter: process.env.CI
     ? [['github'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/results.json' }]]
     : [['html', { open: 'on-failure' }], ['list']],
 
-  // Global test timeout
-  timeout: 30_000,
+  // Global test timeout — 20 s is generous for a local Next.js server.
+  // Tests that need telemetry explicitly wait via waitForTelemetry().
+  timeout: 20_000,
 
   // Shared settings for all tests
   use: {

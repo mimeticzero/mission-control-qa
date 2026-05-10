@@ -12,14 +12,18 @@
 import type { Waypoint, DronePosition } from './types'
 
 export interface DroneSimConfig {
-  id:           string
-  callsign:     string
-  color:        string        // hex color for map + selector UI
-  startBattery: number        // 0-100
-  startWpIndex: number        // which waypoint to start at
-  patrolRoute:  Waypoint[]
-  home:         DronePosition
-  missionName:  string
+  id:              string
+  callsign:        string
+  color:           string        // hex color for map + selector UI
+  startBattery:    number        // 0-100
+  startWpIndex:    number        // which waypoint to start at
+  patrolRoute:     Waypoint[]
+  home:            DronePosition
+  missionName:     string
+  /** Nominal movement speed in m/s. Defaults to 10. */
+  nominalSpeedMs?: number
+  /** Battery (or fuel) drain in % per second. Defaults to 0.056 (~30 min). */
+  batteryDrainRate?: number
 }
 
 // ─── CDG Airport reference ───────────────────────────────────────────────────

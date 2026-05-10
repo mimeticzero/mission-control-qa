@@ -1,20 +1,26 @@
 import { type Page, expect } from '@playwright/test'
 
-/** Navigate to the GCS demo and wait until the simulator produces its first telemetry tick. */
+/** Navigate to the GCS demo and wait until the page is interactive. */
 export async function gotoDemo(page: Page, { e2e = false } = {}) {
   const url = e2e ? '/demo?__e2e=1' : '/demo'
   // networkidle ensures all JS bundles are loaded and executed before we start
   // checking state — this is critical for the Next.js production build where
   // chunk loading happens asynchronously after the initial HTML.
   await page.goto(url, { waitUntil: 'networkidle' })
-  // The simulator fires a synchronous initial tick in start(), so telemetry
-  // should be in the store within the first React render cycle after hydration.
+  // Wait for the command console to confirm the GCS UI is mounted and interactive.
+  // We deliberately do NOT wait for telemetry here — tests that need actual
+  // telemetry values must call waitForTelemetry() explicitly.
+  await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
+}
+
+/** Wait until the first telemetry tick has populated the UI. */
+export async function waitForTelemetry(page: Page, options?: { timeout?: number }) {
   await page.waitForFunction(
     () => {
       const panel = document.querySelector('[data-testid="telemetry-panel"]')
       return panel && !panel.textContent?.includes('AWAITING TELEMETRY')
     },
-    { timeout: 10_000 },
+    { timeout: options?.timeout ?? 10_000 },
   )
 }
 

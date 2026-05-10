@@ -14,7 +14,7 @@
 
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
-import { gotoDemo } from './helpers'
+import { gotoDemo, waitForTelemetry } from './helpers'
 
 // ─── Landing page ────────────────────────────────────────────────────────────
 
@@ -57,6 +57,7 @@ test.describe('GCS Demo — WCAG AA', () => {
 
   test('no axe violations on /demo (map excluded — Leaflet managed accessibility)', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
@@ -86,6 +87,7 @@ test.describe('GCS Demo — WCAG AA', () => {
 
   test('telemetry panel has role=region with aria-label', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
     const panel = page.locator('[data-testid="telemetry-panel"]')
     await expect(panel).toHaveAttribute('role', 'region')
     await expect(panel).toHaveAttribute('aria-label')
@@ -93,6 +95,7 @@ test.describe('GCS Demo — WCAG AA', () => {
 
   test('datalink panel has role=region with aria-label', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
     const panel = page.locator('[data-testid="datalink-status"]')
     await expect(panel).toHaveAttribute('role', 'region')
     await expect(panel).toHaveAttribute('aria-label')

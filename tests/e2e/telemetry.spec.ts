@@ -10,12 +10,13 @@
  */
 
 import { test, expect } from '@playwright/test'
-import { gotoDemo, injectLowBattery, injectDatalinkLoss } from './helpers'
+import { gotoDemo, waitForTelemetry, injectLowBattery, injectDatalinkLoss } from './helpers'
 
 test.describe('Telemetry Updates', () => {
 
   test('flight time counter increments over time', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
 
     // Capture flight time at T0
     const t0 = await page.locator('[data-testid="flight-time"]').textContent()
@@ -30,6 +31,7 @@ test.describe('Telemetry Updates', () => {
 
   test('altitude value changes as drone moves along patrol route', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
 
     const alt0 = await page.locator('[data-testid="altitude-value"]').textContent()
 
@@ -54,6 +56,7 @@ test.describe('Telemetry Updates', () => {
 
   test('battery value is between 0 and 100', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
 
     const battText = await page.locator('[data-testid="battery-value"]').textContent()
     const batt = parseFloat(battText?.replace(/[^0-9.]/g, '') ?? '0')
@@ -63,6 +66,7 @@ test.describe('Telemetry Updates', () => {
 
   test('latency value is a positive number in expected range', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
 
     const latText = await page.locator('[data-testid="latency-value"]').textContent()
     const lat = parseInt(latText?.replace(/\D/g, '') ?? '0', 10)
@@ -76,6 +80,7 @@ test.describe('Telemetry Updates', () => {
 
   test('battery CRITICAL state: text turns red and status badge shows CRITICAL', async ({ page }) => {
     await gotoDemo(page, { e2e: true })
+    await waitForTelemetry(page)
 
     // Inject low battery via test bridge
     await injectLowBattery(page)
@@ -91,6 +96,7 @@ test.describe('Telemetry Updates', () => {
 
   test('battery CRITICAL triggers aria-live assertive announcement', async ({ page }) => {
     await gotoDemo(page, { e2e: true })
+    await waitForTelemetry(page)
     await injectLowBattery(page)
 
     // The battery-value container has aria-live="assertive" when battery < 15%
@@ -102,6 +108,7 @@ test.describe('Telemetry Updates', () => {
 
   test('datalink loss: latency spikes are reflected in the bar chart', async ({ page }) => {
     await gotoDemo(page, { e2e: true })
+    await waitForTelemetry(page)
 
     // Inject degraded datalink
     await injectDatalinkLoss(page)
@@ -113,6 +120,7 @@ test.describe('Telemetry Updates', () => {
 
   test('datalink loss: latency value turns red when above 150ms', async ({ page }) => {
     await gotoDemo(page, { e2e: true })
+    await waitForTelemetry(page)
     await injectDatalinkLoss(page)
 
     // Latency display uses text-gcs-red when latency > 150
@@ -124,6 +132,7 @@ test.describe('Telemetry Updates', () => {
 
   test('waypoint events appear in mission timeline', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
 
     // The first event is the "GCS online" system message which appears immediately.
     // Now that we have a 5-drone fleet, the startup message uses "CDG perimeter patrol".
@@ -133,6 +142,7 @@ test.describe('Telemetry Updates', () => {
 
   test('each event item has a timestamp visible', async ({ page }) => {
     await gotoDemo(page)
+    await waitForTelemetry(page)
 
     // Wait for at least one event item
     const eventCount = await page.locator('[data-testid="event-item"]').count()
@@ -145,6 +155,7 @@ test.describe('Telemetry Updates', () => {
 
   test('CRITICAL events are visually distinguished (red border)', async ({ page }) => {
     await gotoDemo(page, { e2e: true })
+    await waitForTelemetry(page)
     await injectLowBattery(page)
 
     // Send a command that will generate a CRITICAL event

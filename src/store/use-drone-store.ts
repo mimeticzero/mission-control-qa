@@ -8,6 +8,7 @@ import type {
   CommandType,
   GotoPayload,
   TelemetrySnapshot,
+  MissionProfile,
 } from '@/lib/types'
 
 // ─── Fleet member (per-drone state held in the store) ─────────────────────────
@@ -44,14 +45,18 @@ interface DroneStore {
   commands:  Command[]
 
   // ── Global ────────────────────────────────────────────────────────────────
-  events:       MissionEvent[]
-  isSimulating: boolean
-  e2eFrozen:    boolean            // blocks simulator updates in E2E tests
-  ewMode:       boolean            // Electronic Warfare degraded-environment mode
+  events:        MissionEvent[]
+  isSimulating:  boolean
+  e2eFrozen:     boolean            // blocks simulator updates in E2E tests
+  ewMode:        boolean            // Electronic Warfare degraded-environment mode
+  activeProfile: MissionProfile     // currently loaded operational profile
 
   // ── Actions (existing, preserved for backward compat) ─────────────────────
   setSimulating:      (v: boolean) => void
   setE2eFrozen:       (v: boolean) => void
+  setActiveProfile:   (p: MissionProfile) => void
+  /** Clear all fleet state (called before switching profiles). */
+  resetFleet:         (firstDroneId: string) => void
   /** Update selected drone's telemetry (legacy single-drone path). */
   updateTelemetry:    (t: DroneTelemetry, d: DataLink) => void
   pushEvent:          (e: Omit<MissionEvent, 'id' | 'timestamp'>) => void
@@ -80,14 +85,15 @@ export const useDroneStore = create<DroneStore>((set, get) => ({
   fleet:           {},
   selectedDroneId: 'DR-001',
 
-  telemetry:    null,
-  datalink:     null,
-  history:      [],
-  commands:     [],
-  events:       [],
-  isSimulating: false,
-  e2eFrozen:    false,
-  ewMode:       false,
+  telemetry:     null,
+  datalink:      null,
+  history:       [],
+  commands:      [],
+  events:        [],
+  isSimulating:  false,
+  e2eFrozen:     false,
+  ewMode:        false,
+  activeProfile: 'aerial' as MissionProfile,
 
   // ── Basic flags ───────────────────────────────────────────────────────────
 
@@ -96,6 +102,17 @@ export const useDroneStore = create<DroneStore>((set, get) => ({
   setE2eFrozen: (e2eFrozen) => set({ e2eFrozen }),
 
   setEwMode: (ewMode) => set({ ewMode }),
+
+  setActiveProfile: (activeProfile) => set({ activeProfile }),
+
+  resetFleet: (firstDroneId) => set({
+    fleet:           {},
+    selectedDroneId: firstDroneId,
+    telemetry:       null,
+    datalink:        null,
+    history:         [],
+    commands:        [],
+  }),
 
   // ── Drone selection ───────────────────────────────────────────────────────
 

@@ -13,7 +13,7 @@
  */
 
 import { test, expect } from '@playwright/test'
-import { gotoDemo } from './helpers'
+import { gotoDemo, waitForTelemetry } from './helpers'
 
 test.describe('Command Dispatch', () => {
 
@@ -24,6 +24,7 @@ test.describe('Command Dispatch', () => {
   // ── RTH ─────────────────────────────────────────────────────────────────────
 
   test('RTH button dispatches command and flight mode changes', async ({ page }) => {
+    await waitForTelemetry(page)
     // Drone starts at HOME position. Wait for it to travel >5 m away so that
     // the RTH "near home → HOLD" threshold (dist < 5 m) is not immediately triggered.
     // At 10 m/s × 400 ms ticks, 3 ticks ≈ 12 m — well clear.
@@ -51,6 +52,7 @@ test.describe('Command Dispatch', () => {
   // ── HOLD ────────────────────────────────────────────────────────────────────
 
   test('HOLD button dispatches command and changes flight mode', async ({ page }) => {
+    await waitForTelemetry(page)
     await page.click('[data-testid="cmd-hold"]')
 
     await expect(page.locator('[data-testid="cmd-log"]'))
@@ -63,6 +65,7 @@ test.describe('Command Dispatch', () => {
   // ── EMERGENCY_LAND — two-step confirmation ──────────────────────────────────
 
   test('EMERGENCY_LAND requires confirmation dialog before executing', async ({ page }) => {
+    await waitForTelemetry(page)
     // First click: arm the command (should NOT execute yet)
     await page.click('[data-testid="cmd-emrg"]')
 
@@ -75,6 +78,7 @@ test.describe('Command Dispatch', () => {
   })
 
   test('EMERGENCY_LAND executes after two-step confirmation', async ({ page }) => {
+    await waitForTelemetry(page)
     // Step 1: arm
     await page.click('[data-testid="cmd-emrg"]')
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
@@ -110,6 +114,7 @@ test.describe('Command Dispatch', () => {
   })
 
   test('EMERGENCY_LAND can be cancelled via CANCEL button', async ({ page }) => {
+    await waitForTelemetry(page)
     await page.click('[data-testid="cmd-emrg"]')
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
 
@@ -196,6 +201,7 @@ test.describe('Command Dispatch', () => {
   })
 
   test('STATUS command shows current drone state in log', async ({ page }) => {
+    await waitForTelemetry(page)
     const input = page.locator('[data-testid="cmd-input"]')
     await input.click()
     await input.fill('STATUS')

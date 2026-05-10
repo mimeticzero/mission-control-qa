@@ -8,7 +8,7 @@
 
 import { v4 as uuidv4 } from 'uuid'
 import { DroneSim } from './drone-simulator'
-import { FLEET_CONFIG, DEFAULT_DRONE_ID } from './fleet-config'
+import { FLEET_CONFIG } from './fleet-config'
 import type { DroneSimConfig } from './fleet-config'
 import type { DroneTelemetry, DataLink, MissionEvent, Command, CommandType, GotoPayload } from './types'
 import type { FleetUpdate } from '../store/use-drone-store'
@@ -21,8 +21,16 @@ export class FleetSimulator {
   private ewMode   = false
   private readonly TICK_MS = 400
 
-  constructor(private readonly onBatch: FleetBatchCallback) {
-    for (const cfg of FLEET_CONFIG) {
+  /**
+   * @param onBatch  Called once per tick with telemetry for all vehicles.
+   * @param configs  Fleet configuration. Defaults to the AERIAL fleet (FLEET_CONFIG).
+   *                 Pass a different profile's fleet to switch operational context.
+   */
+  constructor(
+    private readonly onBatch: FleetBatchCallback,
+    configs: DroneSimConfig[] = FLEET_CONFIG,
+  ) {
+    for (const cfg of configs) {
       this.sims.set(cfg.id, new DroneSim(cfg))
     }
   }

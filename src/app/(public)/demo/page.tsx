@@ -12,8 +12,11 @@ import { MissionTimeline } from '@/components/gcs/MissionTimeline'
 import { DroneSelector } from '@/components/gcs/DroneSelector'
 import { C2Timeline } from '@/components/gcs/C2Timeline'
 import { EWModeBanner } from '@/components/gcs/EWModeBanner'
+import { MissionProfileSelector } from '@/components/gcs/MissionProfileSelector'
 import { StatusIndicator } from '@/components/ui/StatusIndicator'
 import { TestBridge } from '@/components/TestBridge'
+import { MISSION_PROFILES, VALID_PROFILES, DEFAULT_PROFILE } from '@/lib/mission-profiles'
+import type { MissionProfile } from '@/lib/types'
 import type { CommandType } from '@/lib/types'
 
 // MapView must be loaded client-side only (Leaflet needs window)
@@ -35,12 +38,14 @@ function MapPlaceholder() {
 // ─── HUD Header ───────────────────────────────────────────────────────────────
 
 interface HUDHeaderProps {
-  isSimulating: boolean
-  ewMode:       boolean
-  onToggleEw:   () => void
+  isSimulating:  boolean
+  ewMode:        boolean
+  activeProfile: MissionProfile
+  onToggleEw:    () => void
+  onProfileChange: (p: MissionProfile) => void
 }
 
-function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
+function HUDHeader({ isSimulating, ewMode, activeProfile, onToggleEw, onProfileChange }: HUDHeaderProps) {
   const telemetry = useDroneStore((s) => s.telemetry)
 
   return (
@@ -71,8 +76,8 @@ function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
 
           {/* ── Center: live telemetry (hidden on xs) ── */}
           {telemetry && (
-            <div className="hidden sm:flex items-center gap-3 text-[12px]" aria-live="polite" aria-label="Current drone status">
-              <div className="text-center" title="Current flight mode of the selected drone.">
+            <div className="hidden sm:flex items-center gap-3 text-[12px]" aria-live="polite" aria-label="Current vehicle status">
+              <div className="text-center" title="Current flight mode of the selected vehicle.">
                 <div data-testid="flight-mode" className="text-gcs-cyan font-bold tracking-widest cursor-help"
                      aria-label={`Flight mode: ${telemetry.flightMode}`}>
                   {telemetry.flightMode}
@@ -94,17 +99,25 @@ function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
                 <div className="text-gcs-dim tracking-widest text-[12px]" aria-hidden="true">SYS</div>
               </div>
               <div className="h-4 w-px bg-gcs-border" aria-hidden="true" />
-              <div className="text-center" title="Simulated battery charge level.">
+              <div className="text-center" title="Energy level.">
                 <div data-testid="header-battery" className="text-gcs-cyan font-bold tracking-widest tabular-nums cursor-help">
                   {telemetry.battery.toFixed(0)}%
                 </div>
-                <div className="text-gcs-dim tracking-widest text-[12px]" aria-hidden="true">BATT</div>
+                <div className="text-gcs-dim tracking-widest text-[12px]" aria-hidden="true">
+                  {MISSION_PROFILES[activeProfile].energyLabel.slice(0, 4)}
+                </div>
               </div>
             </div>
           )}
 
           {/* ── Right: controls — always visible ── */}
           <div className="flex items-center gap-2 text-[12px] flex-shrink-0">
+            {/* Mission Profile Selector */}
+            <MissionProfileSelector value={activeProfile} onChange={onProfileChange} />
+
+            <div className="h-4 w-px bg-gcs-border hidden sm:block" aria-hidden="true" />
+
+            {/* EW Mode toggle */}
             <button
               data-testid="ew-mode-toggle"
               onClick={onToggleEw}
@@ -147,6 +160,7 @@ function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
 
 export default function DemoPage() {
   const fleetRef          = useRef<FleetSimulator | null>(null)
+  const scriptRef         = useRef<ScriptEngine | null>(null)
   const batchUpdateFleet  = useDroneStore((s) => s.batchUpdateFleet)
   const dispatchCommandTo = useDroneStore((s) => s.dispatchCommandTo)
   const acknowledgeCommandFor = useDroneStore((s) => s.acknowledgeCommandFor)
@@ -158,32 +172,91 @@ export default function DemoPage() {
   const setSimulating     = useDroneStore((s) => s.setSimulating)
   const setEwMode         = useDroneStore((s) => s.setEwMode)
   const selectDrone       = useDroneStore((s) => s.selectDrone)
+  const setActiveProfile  = useDroneStore((s) => s.setActiveProfile)
+  const resetFleet        = useDroneStore((s) => s.resetFleet)
   const isSimulating      = useDroneStore((s) => s.isSimulating)
   const ewMode            = useDroneStore((s) => s.ewMode)
+  const activeProfile     = useDroneStore((s) => s.activeProfile)
 
-  useEffect(() => {
-    const fleet = new FleetSimulator(batchUpdateFleet)
-    fleetRef.current = fleet
+  // ── Profile-aware simulator bootstrap ────────────────────────────────────
 
-    const script = new ScriptEngine(fleet)
+  const startSimulator = useCallback((profile: MissionProfile) => {
+    // Stop existing simulator/script if running
+    scriptRef.current?.stop()
+    fleetRef.current?.stop()
+
+    const meta     = MISSION_PROFILES[profile]
+    const fleet    = new FleetSimulator(batchUpdateFleet, meta.fleet)
+    const script   = new ScriptEngine(fleet, meta.fleet)
+
+    fleetRef.current  = fleet
+    scriptRef.current = script
 
     fleet.start()
     script.start()
     setSimulating(true)
+  }, [batchUpdateFleet, setSimulating])
 
+  // ── Initial load — read ?profile from URL ────────────────────────────────
+
+  useEffect(() => {
+    const params  = new URLSearchParams(window.location.search)
+    const raw     = params.get('profile') as MissionProfile | null
+    const profile: MissionProfile = (raw && VALID_PROFILES.includes(raw)) ? raw : DEFAULT_PROFILE
+
+    setActiveProfile(profile)
+
+    const meta = MISSION_PROFILES[profile]
     pushEvent({
       type:     'SYSTEM',
-      message:  'Ground Control System online — 5-drone fleet active. CDG perimeter patrol initiated.',
+      message:  meta.missionStartMessage,
       severity: 'INFO',
     })
 
+    startSimulator(profile)
+
     return () => {
-      script.stop()
-      fleet.stop()
+      scriptRef.current?.stop()
+      fleetRef.current?.stop()
       setSimulating(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // ── Profile change handler ────────────────────────────────────────────────
+
+  const handleProfileChange = useCallback((newProfile: MissionProfile) => {
+    if (newProfile === useDroneStore.getState().activeProfile) return
+
+    const meta = MISSION_PROFILES[newProfile]
+
+    // Update URL without full navigation
+    const url = new URL(window.location.href)
+    url.searchParams.set('profile', newProfile)
+    window.history.pushState({}, '', url.toString())
+
+    // Reset store fleet state, switch active profile
+    setActiveProfile(newProfile)
+    resetFleet(meta.fleet[0].id)
+    setEwMode(false)
+
+    // Log the switch
+    pushEvent({
+      type:     'SYSTEM',
+      message:  `↺ Profile switched → ${meta.emoji} ${meta.label} — ${meta.description}`,
+      severity: 'INFO',
+    })
+    pushEvent({
+      type:     'SYSTEM',
+      message:  meta.missionStartMessage,
+      severity: 'INFO',
+    })
+
+    // Restart simulator with new fleet
+    startSimulator(newProfile)
+  }, [setActiveProfile, resetFleet, setEwMode, pushEvent, startSimulator])
+
+  // ── EW mode toggle ────────────────────────────────────────────────────────
 
   const handleToggleEw = useCallback(() => {
     const next = !useDroneStore.getState().ewMode
@@ -246,7 +319,9 @@ export default function DemoPage() {
       <HUDHeader
         isSimulating={isSimulating}
         ewMode={ewMode}
+        activeProfile={activeProfile}
         onToggleEw={handleToggleEw}
+        onProfileChange={handleProfileChange}
       />
 
       <DroneSelector />
