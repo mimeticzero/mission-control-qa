@@ -30,13 +30,13 @@ export class FleetSimulator {
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   /**
-   * Start the fleet. Emits the first batch after one tick delay (400 ms), then
-   * every 400 ms thereafter. The delay ensures any UI animations triggered at mount
-   * time (e.g., event list fade-in) have completed before telemetry arrives, which
-   * in turn lets Playwright's gotoDemo() helper return only after animations settle.
+   * Start the fleet. Emits an initial batch synchronously (so TelemetryPanel
+   * renders immediately and Playwright's gotoDemo() can detect it), then
+   * continues every 400 ms via setInterval.
    */
   start() {
     if (this.intervalId) return
+    this.emitBatch(true)
     this.intervalId = setInterval(() => this.emitBatch(false), this.TICK_MS)
   }
 

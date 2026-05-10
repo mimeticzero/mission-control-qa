@@ -118,7 +118,7 @@ export function TelemetryPanel({ className = '' }: { className?: string }) {
 
   if (!telemetry) {
     return (
-      <div className={`panel flex items-center justify-center ${className}`}>
+      <div data-testid="telemetry-panel" className={`panel flex items-center justify-center ${className}`}>
         <span className="text-gcs-muted text-xs tracking-widest animate-pulse">
           AWAITING TELEMETRY…
         </span>
