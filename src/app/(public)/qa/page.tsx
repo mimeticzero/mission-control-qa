@@ -88,7 +88,7 @@ export default function QAPage() {
     <div style={{ background: C.bg, minHeight: '100vh', color: C.tPri, fontFamily: 'Space Mono, Courier New, monospace' }}>
 
       {/* ── HIRE BANNER ── */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(3,5,8,0.96)', borderBottom: `1px solid rgba(0,245,255,0.12)`, padding: '10px clamp(16px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(3,5,8,0.96)', borderBottom: `1px solid rgba(0,245,255,0.12)`, padding: '10px clamp(16px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: C.green, boxShadow: `0 0 6px ${C.green}99`, display: 'inline-block', flexShrink: 0 }} />
           <span style={{ fontSize: '13px', color: C.tPri, letterSpacing: '1px' }}>Available for freelance missions · 600–800€/day</span>
