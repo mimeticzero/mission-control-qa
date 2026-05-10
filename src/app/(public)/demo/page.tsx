@@ -42,7 +42,6 @@ interface HUDHeaderProps {
 
 function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
   const telemetry = useDroneStore((s) => s.telemetry)
-  const now       = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC'
 
   return (
     <div className="flex-shrink-0">
@@ -50,16 +49,12 @@ function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
         data-testid="gcs-header"
         role="banner"
         aria-label="Mission Control header"
-        className="
-          border-b border-gcs-border bg-gcs-panel
-          flex items-center justify-between px-4 py-2 flex-shrink-0
-          animate-flicker
-        "
+        className="border-b border-gcs-border bg-gcs-panel flex-shrink-0 animate-flicker"
       >
-        {/* Left: logo + system ID */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            {/* Logo */}
+        <div className="flex items-center justify-between gap-2 px-3 py-2 flex-wrap">
+
+          {/* ── Left: logo ── */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <svg width="20" height="20" viewBox="0 0 20 20" className="text-gcs-cyan flex-shrink-0">
               <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="1.5" />
               <circle cx="10" cy="10" r="3"  fill="currentColor" />
@@ -69,89 +64,76 @@ function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
               <line x1="14" y1="10" x2="18" y2="10" stroke="currentColor" strokeWidth="1.5" />
             </svg>
             <div>
-              <div className="text-gcs-cyan text-xs font-bold tracking-[0.2em] uppercase">
-                Mission Control
-              </div>
-              <div className="text-gcs-dim text-[9px] tracking-widest uppercase">
-                QA Demo — Educational
-              </div>
+              <div className="text-gcs-cyan text-[12px] font-bold tracking-[0.2em] uppercase">Mission Control</div>
+              <div className="text-gcs-dim text-[12px] tracking-widest uppercase hidden sm:block">GCS-DEMO-01</div>
             </div>
           </div>
 
-          <div className="h-6 w-px bg-gcs-border" />
+          {/* ── Center: live telemetry (hidden on xs) ── */}
+          {telemetry && (
+            <div className="hidden sm:flex items-center gap-3 text-[12px]" aria-live="polite" aria-label="Current drone status">
+              <div className="text-center" title="Current flight mode of the selected drone.">
+                <div data-testid="flight-mode" className="text-gcs-cyan font-bold tracking-widest cursor-help"
+                     aria-label={`Flight mode: ${telemetry.flightMode}`}>
+                  {telemetry.flightMode}
+                </div>
+                <div className="text-gcs-dim tracking-widest text-[12px]" aria-hidden="true">MODE</div>
+              </div>
+              <div className="h-4 w-px bg-gcs-border" aria-hidden="true" />
+              <div className="text-center" title="System health.">
+                <div
+                  data-testid="drone-status"
+                  aria-label={`System status: ${telemetry.status}`}
+                  className={`font-bold tracking-widest cursor-help ${
+                    telemetry.status === 'CRITICAL' ? 'text-gcs-red animate-pulse' :
+                    telemetry.status === 'WARNING'  ? 'text-gcs-yellow' : 'text-gcs-green'
+                  }`}
+                >
+                  {telemetry.status}
+                </div>
+                <div className="text-gcs-dim tracking-widest text-[12px]" aria-hidden="true">SYS</div>
+              </div>
+              <div className="h-4 w-px bg-gcs-border" aria-hidden="true" />
+              <div className="text-center" title="Simulated battery charge level.">
+                <div data-testid="header-battery" className="text-gcs-cyan font-bold tracking-widest tabular-nums cursor-help">
+                  {telemetry.battery.toFixed(0)}%
+                </div>
+                <div className="text-gcs-dim tracking-widest text-[12px]" aria-hidden="true">BATT</div>
+              </div>
+            </div>
+          )}
 
-          <div className="text-[10px] text-gcs-muted tracking-wider">
-            SYS-ID&nbsp;<span className="text-gcs-cyan">GCS-DEMO-01</span>
+          {/* ── Right: controls — always visible ── */}
+          <div className="flex items-center gap-2 text-[12px] flex-shrink-0">
+            <button
+              data-testid="ew-mode-toggle"
+              onClick={onToggleEw}
+              aria-pressed={ewMode}
+              aria-label={ewMode ? 'Disable Electronic Warfare mode' : 'Enable Electronic Warfare mode'}
+              title="EW Mode: simulates signal jamming — RSSI degradation, latency spikes, packet loss."
+              className={`
+                border px-2 py-1 text-[12px] tracking-widest transition-colors cursor-help
+                ${ewMode
+                  ? 'border-gcs-red text-gcs-red bg-gcs-red/10 animate-pulse'
+                  : 'border-gcs-border text-gcs-dim hover:border-gcs-yellow hover:text-gcs-yellow'
+                }
+              `}
+            >
+              EW
+            </button>
+            <StatusIndicator
+              state={isSimulating ? 'nominal' : 'offline'}
+              label={isSimulating ? 'SIM ON' : 'PAUSED'}
+            />
+            <a
+              href="/mission-control"
+              className="border border-gcs-border px-2 py-1 text-[12px] text-gcs-muted
+                         hover:border-gcs-cyan hover:text-gcs-cyan transition-colors tracking-widest"
+            >
+              EXIT
+            </a>
           </div>
-        </div>
 
-        {/* Center: current mode + status */}
-        {telemetry && (
-          <div className="flex items-center gap-4 text-[10px]" aria-live="polite" aria-label="Current drone status">
-            <div className="text-center">
-              <div data-testid="flight-mode" className="text-gcs-cyan font-bold tracking-widest"
-                   aria-label={`Flight mode: ${telemetry.flightMode}`}>
-                {telemetry.flightMode}
-              </div>
-              <div className="text-gcs-dim tracking-widest" aria-hidden="true">FLIGHT MODE</div>
-            </div>
-            <div className="h-4 w-px bg-gcs-border" aria-hidden="true" />
-            <div className="text-center">
-              <div
-                data-testid="drone-status"
-                aria-label={`System status: ${telemetry.status}`}
-                className={`font-bold tracking-widest ${
-                  telemetry.status === 'CRITICAL' ? 'text-gcs-red animate-pulse' :
-                  telemetry.status === 'WARNING'  ? 'text-gcs-yellow' : 'text-gcs-green'
-                }`}
-              >
-                {telemetry.status}
-              </div>
-              <div className="text-gcs-dim tracking-widest" aria-hidden="true">SYSTEM</div>
-            </div>
-            <div className="h-4 w-px bg-gcs-border" aria-hidden="true" />
-            <div className="text-center">
-              <div data-testid="header-battery" className="text-gcs-cyan font-bold tracking-widest tabular-nums">
-                {telemetry.battery.toFixed(0)}%
-              </div>
-              <div className="text-gcs-dim tracking-widest" aria-hidden="true">BATTERY</div>
-            </div>
-          </div>
-        )}
-
-        {/* Right: EW toggle + timestamp + link status */}
-        <div className="flex items-center gap-4 text-[10px]">
-          {/* EW Mode toggle */}
-          <button
-            data-testid="ew-mode-toggle"
-            onClick={onToggleEw}
-            aria-pressed={ewMode}
-            aria-label={ewMode ? 'Disable Electronic Warfare mode' : 'Enable Electronic Warfare mode'}
-            className={`
-              border px-2 py-1 text-[9px] tracking-widest transition-colors
-              ${ewMode
-                ? 'border-gcs-red text-gcs-red bg-gcs-red/10 animate-pulse'
-                : 'border-gcs-border text-gcs-dim hover:border-gcs-yellow hover:text-gcs-yellow'
-              }
-            `}
-          >
-            EW MODE
-          </button>
-
-          <div className="h-4 w-px bg-gcs-border" />
-          <StatusIndicator
-            state={isSimulating ? 'nominal' : 'offline'}
-            label={isSimulating ? 'SIM RUNNING' : 'SIM PAUSED'}
-          />
-          <div className="h-4 w-px bg-gcs-border" />
-          <div className="text-gcs-dim tabular-nums">{now}</div>
-          <a
-            href="/mission-control"
-            className="ml-2 border border-gcs-border px-2 py-1 text-[9px] text-gcs-muted
-                       hover:border-gcs-cyan hover:text-gcs-cyan transition-colors tracking-widest"
-          >
-            EXIT
-          </a>
         </div>
       </header>
 
@@ -259,7 +241,7 @@ export default function DemoPage() {
   }, [dispatchCommand, acknowledgeCommand, failCommand, pushEvent])
 
   return (
-    <div className="flex flex-col h-screen bg-gcs-bg overflow-hidden">
+    <div className="flex flex-col bg-gcs-bg md:h-screen md:overflow-hidden min-h-screen">
       <TestBridge />
       <HUDHeader
         isSimulating={isSimulating}
@@ -267,42 +249,41 @@ export default function DemoPage() {
         onToggleEw={handleToggleEw}
       />
 
-      {/* Drone selector tabs */}
       <DroneSelector />
 
-      {/*
-        Main grid:
-          [Map 60%] [Telemetry + Datalink 40%]
-          [Command Console 50%] [Mission Timeline 50%]
-      */}
-      <div className="flex-1 grid grid-cols-5 grid-rows-[1fr_auto] min-h-0 gap-px bg-gcs-border">
+      {/* ── Mobile: scrollable stack · Desktop: fixed-height grid ── */}
+      <div className="flex-1 md:overflow-hidden md:min-h-0 overflow-y-auto">
 
-        {/* Map — spans 3 cols, full height */}
-        <div className="col-span-3 row-span-2 min-h-0">
-          <MapView
-            className="w-full h-full"
-            onDroneClick={handleDroneClick}
-          />
+        {/* Map — full width on mobile */}
+        <div className="md:hidden h-[320px] border-b border-gcs-border">
+          <MapView className="w-full h-full" onDroneClick={handleDroneClick} />
         </div>
 
-        {/* Right column — Telemetry + Datalink stacked */}
-        <div className="col-span-2 row-span-1 grid grid-rows-[3fr_2fr] min-h-0 gap-px bg-gcs-border">
-          <TelemetryPanel className="min-h-0 overflow-hidden" />
-          <DatalinkStatus className="min-h-0 overflow-hidden" />
+        {/* Desktop 5-col grid */}
+        <div className="hidden md:grid md:grid-cols-5 md:grid-rows-[1fr_auto] gap-px bg-gcs-border h-full">
+          <div className="col-span-3 row-span-2 min-h-0" style={{ minHeight: '480px' }}>
+            <MapView className="w-full h-full" onDroneClick={handleDroneClick} />
+          </div>
+          <div className="col-span-2 row-span-1 grid grid-rows-[3fr_2fr] min-h-0 gap-px bg-gcs-border">
+            <TelemetryPanel className="min-h-0 overflow-hidden" />
+            <DatalinkStatus className="min-h-0 overflow-hidden" />
+          </div>
+          <div className="col-span-2 row-span-1 grid grid-cols-2 min-h-0 gap-px bg-gcs-border"
+               style={{ height: '280px' }}>
+            <CommandConsole onCommand={handleCommand} className="min-h-0 overflow-hidden" />
+            <MissionTimeline className="min-h-0 overflow-hidden" />
+          </div>
         </div>
 
-        {/* Bottom row — Command Console + Mission Timeline */}
-        <div className="col-span-2 row-span-1 grid grid-cols-2 min-h-0 gap-px bg-gcs-border"
-             style={{ height: '280px' }}>
-          <CommandConsole
-            onCommand={handleCommand}
-            className="min-h-0 overflow-hidden"
-          />
-          <MissionTimeline className="min-h-0 overflow-hidden" />
+        {/* Mobile stacked panels */}
+        <div className="md:hidden flex flex-col gap-px bg-gcs-border">
+          <TelemetryPanel className="overflow-hidden" />
+          <DatalinkStatus className="overflow-hidden" />
+          <CommandConsole onCommand={handleCommand} className="overflow-hidden" />
+          <MissionTimeline className="overflow-hidden" />
         </div>
       </div>
 
-      {/* C2 Timeline — full-width strip below main grid */}
       <C2Timeline />
     </div>
   )
