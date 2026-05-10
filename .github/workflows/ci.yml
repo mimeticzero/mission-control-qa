@@ -40,6 +40,8 @@ jobs:
         with: { node-version: '20', cache: 'npm' }
       - run: npm ci
       - run: npm run build
+      - name: Verify build output exists
+        run: ls -la .next/ && echo "BUILD OK — .next/ exists"
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -48,6 +50,8 @@ jobs:
             .next/
             public/
           retention-days: 1
+      - name: Confirm artifact uploaded
+        run: echo "ARTIFACT UPLOADED — nextjs-build-${{ github.sha }}"
 
   # ── Playwright E2E — download shared artifact ─────────────────────────────────
   e2e:
