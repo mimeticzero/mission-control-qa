@@ -156,7 +156,7 @@ export default function QAPage() {
                     <div style={{ width: '100%', height: '100%', background: color, borderRadius: '2px' }} />
                   </div>
                   <span style={{ fontSize: '12px', color, fontWeight: 700, width: '36px', textAlign: 'right', flexShrink: 0 }}>{tests}</span>
-                  <Badge color={C.green}>✓ PASS</Badge>
+                  <Badge color={C.green}>PASS</Badge>
                 </div>
               ))}
             </div>
@@ -180,7 +180,10 @@ export default function QAPage() {
 
           {/* ── TEST SCENARIO TABLE ── */}
           <div style={{ marginTop: '28px' }}>
-            <div style={{ fontSize: '12px', letterSpacing: '2px', color: C.tDim, marginBottom: '12px' }}>REPRESENTATIVE TEST SCENARIOS</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '12px' }}>
+              <div style={{ fontSize: '12px', letterSpacing: '2px', color: C.tDim }}>REPRESENTATIVE TEST SCENARIOS</div>
+              <div style={{ fontSize: '12px', color: C.tMut }}>14 of 207 — <a href="https://github.com/mimeticzero/mission-control-qa" target="_blank" rel="noopener noreferrer" style={{ color: C.green, textDecoration: 'none' }}>full suite on GitHub ↗</a></div>
+            </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', minWidth: '480px' }}>
                 <thead>
@@ -211,8 +214,8 @@ export default function QAPage() {
                       <td style={{ padding: '10px 14px', color: C.cyan, fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', letterSpacing: '1px', whiteSpace: 'nowrap', verticalAlign: 'top' }}>{suite}</td>
                       <td style={{ padding: '10px 14px', color: C.tSec, lineHeight: 1.5, verticalAlign: 'top' }}>{scenario}</td>
                       <td style={{ padding: '10px 14px', textAlign: 'center', verticalAlign: 'top' }}>
-                        <span style={{ fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', border: `1px solid ${pass ? C.green : C.pink}44`, color: pass ? C.green : C.pink, fontWeight: 700 }}>
-                          {pass ? '✓ PASS' : '✗ FAIL'}
+                        <span style={{ fontSize: '12px', letterSpacing: '2px', padding: '3px 8px', border: `1px solid ${pass ? C.green : C.pink}44`, color: pass ? C.green : C.pink, fontWeight: 700 }}>
+                          {pass ? 'PASS' : 'FAIL'}
                         </span>
                       </td>
                     </tr>
@@ -313,10 +316,10 @@ export default function QAPage() {
           <div style={{ padding: '14px 18px', background: `${C.green}08`, border: `1px solid ${C.green}33`, marginBottom: '16px', fontSize: '13px', color: C.green, letterSpacing: '1px' }}>
             ✓ ZERO high-severity vulnerabilities · All security headers configured · CSP active · X-Frame-Options DENY
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ textAlign: 'center', marginTop: '8px' }}>
             <a href="https://sakuranode.com/reports/mission-control-zap.html" target="_blank" rel="noopener noreferrer"
-              style={{ fontSize: '12px', letterSpacing: '2px', color: C.purple, textDecoration: 'none', border: `1px solid ${C.purple}55`, padding: '8px 20px' }}>
-              → Full ZAP Report ↗
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12px', letterSpacing: '3px', color: C.purple, textDecoration: 'none', border: `1px solid ${C.purple}88`, padding: '12px 32px', fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', background: `${C.purple}08` }}>
+              → FULL ZAP REPORT ↗
             </a>
           </div>
         </SectionBox>
