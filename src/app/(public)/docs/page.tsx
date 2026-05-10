@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 /* ── Design tokens ── */
 
 const C = {
-  bg:            '#0d0f14',
+  bg:            '#030508',
   surface:       'rgba(255,255,255,0.03)',
   border:        'rgba(255,255,255,0.08)',
   cyan:          '#00f5ff',
@@ -75,6 +75,25 @@ const NAV_ITEMS = [
 export default function DocsPage() {
   return (
     <div style={{ background: C.bg, minHeight: '100vh', color: C.textPrimary, fontFamily: 'Space Mono, Courier New, monospace' }}>
+
+      {/* ── HIRE BANNER ── */}
+      <div style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: 'rgba(3,5,8,0.96)',
+        borderBottom: `1px solid rgba(0,245,255,0.12)`,
+        padding: '10px clamp(16px,4vw,48px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: C.green, boxShadow: `0 0 6px ${C.green}99`, display: 'inline-block', flexShrink: 0 }} />
+          <span style={{ fontSize: '12px', color: C.textPrimary, letterSpacing: '1px' }}>Available for freelance missions · 600–800€/day</span>
+          <span style={{ fontSize: '11px', color: C.textMuted, letterSpacing: '1px' }}>SDET / QA Architect · Remote · EN/FR</span>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <a href="https://sakuranode.com/hire#contact"  style={{ fontSize: '11px', letterSpacing: '2px', textDecoration: 'none', padding: '5px 14px', color: C.cyan,    border: '1px solid rgba(0,245,255,0.3)' }}>→ Start a project</a>
+          <a href="https://sakuranode.com/hire#missions" style={{ fontSize: '11px', letterSpacing: '2px', textDecoration: 'none', padding: '5px 14px', color: '#ff2d78', border: '1px solid rgba(255,45,120,0.3)' }}>→ See typical missions</a>
+        </div>
+      </div>
 
       {/* ── TOP NAV ── */}
       <nav style={{
