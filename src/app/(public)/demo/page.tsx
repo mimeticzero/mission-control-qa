@@ -243,7 +243,7 @@ export default function DemoPage() {
     // Log the switch
     pushEvent({
       type:     'SYSTEM',
-      message:  `↺ Profile switched → ${meta.emoji} ${meta.label} — ${meta.description}`,
+      message:  `↺ Profile switched → ${meta.label} — ${meta.description}`,
       severity: 'INFO',
     })
     pushEvent({

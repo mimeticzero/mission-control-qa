@@ -19,7 +19,7 @@ test.describe('GCS Dashboard Rendering', () => {
 
   test('reaches interactive state within 2 seconds', async ({ page }) => {
     const navigationStart = Date.now()
-    await page.goto('/demo')
+    await page.goto('/mission-control/demo')
 
     // "Interactive" = command console is visible and focusable
     // This is the main operator input — if it's ready, the UI is ready.

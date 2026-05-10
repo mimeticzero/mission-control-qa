@@ -170,48 +170,52 @@ const GROUND_FLEET: DroneSimConfig[] = [
 
 const sea0: number = 0   // surface altitude
 
+// All waypoints stay within the open Rade de Brest water area:
+// lat 48.31–48.40°N · lng -4.55 to -4.44°E
+// — avoids Presqu'île de Plougastel (east), Crozon coast (south), Brest shore (north)
+
 const marRouteA: Waypoint[] = [
   { lat: 48.3450, lng: -4.4850, altitude: sea0, name: 'BRAVO-ANCHORAGE' },
-  { lat: 48.3600, lng: -4.4600, altitude: sea0, name: 'NORTH-CHANNEL'   },
-  { lat: 48.3750, lng: -4.4400, altitude: sea0, name: 'NE-PATROL'       },
-  { lat: 48.3700, lng: -4.4100, altitude: sea0, name: 'EAST-LIMIT'      },
-  { lat: 48.3550, lng: -4.4050, altitude: sea0, name: 'SE-PATROL'       },
-  { lat: 48.3350, lng: -4.4200, altitude: sea0, name: 'SOUTH-CHANNEL'   },
-  { lat: 48.3200, lng: -4.4550, altitude: sea0, name: 'SW-APPROACH'     },
-  { lat: 48.3300, lng: -4.4900, altitude: sea0, name: 'WEST-PATROL'     },
+  { lat: 48.3780, lng: -4.4780, altitude: sea0, name: 'NORTH-CHANNEL'   },
+  { lat: 48.3900, lng: -4.4650, altitude: sea0, name: 'NE-PATROL'       },
+  { lat: 48.3820, lng: -4.4500, altitude: sea0, name: 'EAST-LIMIT'      },
+  { lat: 48.3600, lng: -4.4480, altitude: sea0, name: 'SE-PATROL'       },
+  { lat: 48.3350, lng: -4.4520, altitude: sea0, name: 'SOUTH-CHANNEL'   },
+  { lat: 48.3150, lng: -4.4720, altitude: sea0, name: 'SW-APPROACH'     },
+  { lat: 48.3280, lng: -4.4950, altitude: sea0, name: 'WEST-PATROL'     },
 ]
 const marRouteB: Waypoint[] = [
-  { lat: 48.3500, lng: -4.4750, altitude: sea0, name: 'INNER-1' },
-  { lat: 48.3580, lng: -4.4640, altitude: sea0, name: 'INNER-2' },
-  { lat: 48.3620, lng: -4.4480, altitude: sea0, name: 'INNER-3' },
-  { lat: 48.3560, lng: -4.4350, altitude: sea0, name: 'INNER-4' },
-  { lat: 48.3440, lng: -4.4380, altitude: sea0, name: 'INNER-5' },
-  { lat: 48.3380, lng: -4.4560, altitude: sea0, name: 'INNER-6' },
+  { lat: 48.3500, lng: -4.4760, altitude: sea0, name: 'INNER-1' },
+  { lat: 48.3640, lng: -4.4680, altitude: sea0, name: 'INNER-2' },
+  { lat: 48.3740, lng: -4.4580, altitude: sea0, name: 'INNER-3' },
+  { lat: 48.3720, lng: -4.4480, altitude: sea0, name: 'INNER-4' },
+  { lat: 48.3560, lng: -4.4480, altitude: sea0, name: 'INNER-5' },
+  { lat: 48.3400, lng: -4.4580, altitude: sea0, name: 'INNER-6' },
 ]
 const marRouteC: Waypoint[] = [
-  { lat: 48.3680, lng: -4.5000, altitude: sea0, name: 'N-1' },
-  { lat: 48.3800, lng: -4.4750, altitude: sea0, name: 'N-2' },
-  { lat: 48.3820, lng: -4.4450, altitude: sea0, name: 'N-3' },
-  { lat: 48.3760, lng: -4.4200, altitude: sea0, name: 'N-4' },
-  { lat: 48.3640, lng: -4.4150, altitude: sea0, name: 'N-5' },
-  { lat: 48.3560, lng: -4.4350, altitude: sea0, name: 'N-6' },
+  { lat: 48.3700, lng: -4.5020, altitude: sea0, name: 'N-1' },
+  { lat: 48.3870, lng: -4.4900, altitude: sea0, name: 'N-2' },
+  { lat: 48.3940, lng: -4.4720, altitude: sea0, name: 'N-3' },
+  { lat: 48.3880, lng: -4.4580, altitude: sea0, name: 'N-4' },
+  { lat: 48.3720, lng: -4.4520, altitude: sea0, name: 'N-5' },
+  { lat: 48.3580, lng: -4.4620, altitude: sea0, name: 'N-6' },
 ]
 const marRouteD: Waypoint[] = [
-  { lat: 48.3280, lng: -4.4650, altitude: sea0, name: 'S-1' },
-  { lat: 48.3250, lng: -4.4400, altitude: sea0, name: 'S-2' },
-  { lat: 48.3290, lng: -4.4180, altitude: sea0, name: 'S-3' },
-  { lat: 48.3380, lng: -4.4100, altitude: sea0, name: 'S-4' },
-  { lat: 48.3450, lng: -4.4200, altitude: sea0, name: 'S-5' },
-  { lat: 48.3420, lng: -4.4450, altitude: sea0, name: 'S-6' },
+  { lat: 48.3300, lng: -4.4680, altitude: sea0, name: 'S-1' },
+  { lat: 48.3180, lng: -4.4600, altitude: sea0, name: 'S-2' },
+  { lat: 48.3120, lng: -4.4780, altitude: sea0, name: 'S-3' },
+  { lat: 48.3180, lng: -4.4960, altitude: sea0, name: 'S-4' },
+  { lat: 48.3300, lng: -4.5000, altitude: sea0, name: 'S-5' },
+  { lat: 48.3380, lng: -4.4860, altitude: sea0, name: 'S-6' },
 ]
 const marRouteE: Waypoint[] = [
-  { lat: 48.3350, lng: -4.5200, altitude: sea0, name: 'W-1' },
-  { lat: 48.3450, lng: -4.5100, altitude: sea0, name: 'W-2' },
-  { lat: 48.3550, lng: -4.5050, altitude: sea0, name: 'W-3' },
-  { lat: 48.3650, lng: -4.5150, altitude: sea0, name: 'W-4' },
-  { lat: 48.3700, lng: -4.5350, altitude: sea0, name: 'W-5' },
-  { lat: 48.3580, lng: -4.5400, altitude: sea0, name: 'W-6' },
-  { lat: 48.3430, lng: -4.5380, altitude: sea0, name: 'W-7' },
+  { lat: 48.3400, lng: -4.5200, altitude: sea0, name: 'W-1' },
+  { lat: 48.3520, lng: -4.5120, altitude: sea0, name: 'W-2' },
+  { lat: 48.3650, lng: -4.5100, altitude: sea0, name: 'W-3' },
+  { lat: 48.3760, lng: -4.5200, altitude: sea0, name: 'W-4' },
+  { lat: 48.3820, lng: -4.5360, altitude: sea0, name: 'W-5' },
+  { lat: 48.3700, lng: -4.5440, altitude: sea0, name: 'W-6' },
+  { lat: 48.3520, lng: -4.5380, altitude: sea0, name: 'W-7' },
 ]
 
 function marHome(lat: number, lng: number): DronePosition {
@@ -220,10 +224,10 @@ function marHome(lat: number, lng: number): DronePosition {
 
 const MARITIME_FLEET: DroneSimConfig[] = [
   { id: 'MV-001', callsign: 'POSEIDON-1', color: '#06b6d4', startBattery: 100, startWpIndex: 0, patrolRoute: marRouteA, home: marHome(48.3450, -4.4850), missionName: 'Outer Rade Patrol',    nominalSpeedMs: 3.5, batteryDrainRate: 0.008 },
-  { id: 'MV-002', callsign: 'KRAKEN-2',   color: '#22c55e', startBattery: 91,  startWpIndex: 2, patrolRoute: marRouteB, home: marHome(48.3500, -4.4750), missionName: 'Inner Harbour Watch',  nominalSpeedMs: 2.5, batteryDrainRate: 0.008 },
-  { id: 'MV-003', callsign: 'NEPTUNE-3',  color: '#fbbf24', startBattery: 78,  startWpIndex: 1, patrolRoute: marRouteC, home: marHome(48.3680, -4.5000), missionName: 'Northern Approach',    nominalSpeedMs: 4.0, batteryDrainRate: 0.008 },
-  { id: 'MV-004', callsign: 'TRITON-4',   color: '#f97316', startBattery: 65,  startWpIndex: 3, patrolRoute: marRouteD, home: marHome(48.3280, -4.4650), missionName: 'South Channel Screen', nominalSpeedMs: 3.0, batteryDrainRate: 0.008 },
-  { id: 'MV-005', callsign: 'NEREIDE-5',  color: '#a855f7', startBattery: 85,  startWpIndex: 0, patrolRoute: marRouteE, home: marHome(48.3350, -4.5200), missionName: 'Western Approaches',   nominalSpeedMs: 3.8, batteryDrainRate: 0.008 },
+  { id: 'MV-002', callsign: 'KRAKEN-2',   color: '#22c55e', startBattery: 91,  startWpIndex: 2, patrolRoute: marRouteB, home: marHome(48.3500, -4.4760), missionName: 'Inner Harbour Watch',  nominalSpeedMs: 2.5, batteryDrainRate: 0.008 },
+  { id: 'MV-003', callsign: 'NEPTUNE-3',  color: '#fbbf24', startBattery: 78,  startWpIndex: 1, patrolRoute: marRouteC, home: marHome(48.3700, -4.5020), missionName: 'Northern Approach',    nominalSpeedMs: 4.0, batteryDrainRate: 0.008 },
+  { id: 'MV-004', callsign: 'TRITON-4',   color: '#f97316', startBattery: 65,  startWpIndex: 3, patrolRoute: marRouteD, home: marHome(48.3300, -4.4680), missionName: 'South Channel Screen', nominalSpeedMs: 3.0, batteryDrainRate: 0.008 },
+  { id: 'MV-005', callsign: 'NEREIDE-5',  color: '#a855f7', startBattery: 85,  startWpIndex: 0, patrolRoute: marRouteE, home: marHome(48.3400, -4.5200), missionName: 'Western Approaches',   nominalSpeedMs: 3.8, batteryDrainRate: 0.008 },
 ]
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -302,7 +306,7 @@ export const MISSION_PROFILES: Record<MissionProfile, ProfileMeta> = {
   aerial: {
     id:                  'aerial',
     label:               'AERIAL',
-    emoji:               '🚁',
+    emoji:               '',
     description:         'Aerial surveillance — 5-drone UAV fleet, Paris CDG perimeter patrol',
     mapCenter:           [49.0200, 2.5400],
     mapZoom:             12,
@@ -319,7 +323,7 @@ export const MISSION_PROFILES: Record<MissionProfile, ProfileMeta> = {
   ground: {
     id:                  'ground',
     label:               'GROUND',
-    emoji:               '🚜',
+    emoji:               '',
     description:         'Ground vehicle convoy — 5-vehicle escort, Satory military zone',
     mapCenter:           [48.7970, 2.1050],
     mapZoom:             14,
@@ -336,9 +340,9 @@ export const MISSION_PROFILES: Record<MissionProfile, ProfileMeta> = {
   maritime: {
     id:                  'maritime',
     label:               'MARITIME',
-    emoji:               '🌊',
+    emoji:               '',
     description:         'Maritime patrol — 5-vessel surface fleet, Rade de Brest',
-    mapCenter:           [48.3500, -4.4600],
+    mapCenter:           [48.3550, -4.4950],
     mapZoom:             12,
     datalinkLabel:       'ACOUSTIC LINK',
     speedLabel:          'SPD OVR WTR',
@@ -353,7 +357,7 @@ export const MISSION_PROFILES: Record<MissionProfile, ProfileMeta> = {
   ugv: {
     id:                  'ugv',
     label:               'UGV',
-    emoji:               '🤖',
+    emoji:               '',
     description:         'Robotic recon — 5 unmanned ground vehicles, Mourmelon training area',
     mapCenter:           [49.1220, 4.3890],
     mapZoom:             15,

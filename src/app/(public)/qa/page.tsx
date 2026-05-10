@@ -2,6 +2,52 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { TestTable } from './TestTable'
 
+function ProfileSvg({ profile, color, size = 18 }: { profile: string; color: string; size?: number }) {
+  const s = { width: size, height: size, display: 'inline-block' as const, verticalAlign: 'middle' as const }
+  if (profile === 'aerial') return (
+    <svg {...s} viewBox="0 0 20 20" aria-hidden="true">
+      <circle cx="10" cy="10" r="3" fill={color}/>
+      <line x1="10" y1="10" x2="3"  y2="3"  stroke={color} strokeWidth="1.2" opacity="0.7"/>
+      <line x1="10" y1="10" x2="17" y2="3"  stroke={color} strokeWidth="1.2" opacity="0.7"/>
+      <line x1="10" y1="10" x2="3"  y2="17" stroke={color} strokeWidth="1.2" opacity="0.7"/>
+      <line x1="10" y1="10" x2="17" y2="17" stroke={color} strokeWidth="1.2" opacity="0.7"/>
+      <circle cx="3"  cy="3"  r="2" fill="none" stroke={color} strokeWidth="1"/>
+      <circle cx="17" cy="3"  r="2" fill="none" stroke={color} strokeWidth="1"/>
+      <circle cx="3"  cy="17" r="2" fill="none" stroke={color} strokeWidth="1"/>
+      <circle cx="17" cy="17" r="2" fill="none" stroke={color} strokeWidth="1"/>
+    </svg>
+  )
+  if (profile === 'ground') return (
+    <svg {...s} viewBox="0 0 20 20" aria-hidden="true">
+      <rect x="5" y="4" width="10" height="12" rx="1.5" fill={color} opacity="0.9"/>
+      <circle cx="7"  cy="16" r="2" fill="none" stroke={color} strokeWidth="1.2"/>
+      <circle cx="13" cy="16" r="2" fill="none" stroke={color} strokeWidth="1.2"/>
+      <circle cx="7"  cy="4"  r="2" fill="none" stroke={color} strokeWidth="1.2"/>
+      <circle cx="13" cy="4"  r="2" fill="none" stroke={color} strokeWidth="1.2"/>
+      <line x1="10" y1="4" x2="10" y2="2" stroke={color} strokeWidth="1.2"/>
+    </svg>
+  )
+  if (profile === 'maritime') return (
+    <svg {...s} viewBox="0 0 20 20" aria-hidden="true">
+      <ellipse cx="10" cy="11" rx="4" ry="7" fill={color} opacity="0.9"/>
+      <line x1="10" y1="4" x2="10" y2="1" stroke={color} strokeWidth="1.5"/>
+      <line x1="10" y1="4" x2="7"  y2="7" stroke={color} strokeWidth="0.8" opacity="0.6"/>
+      <line x1="10" y1="4" x2="13" y2="7" stroke={color} strokeWidth="0.8" opacity="0.6"/>
+      <ellipse cx="10" cy="11" rx="2.5" ry="5" fill="none" stroke={color} strokeWidth="0.8" opacity="0.5"/>
+    </svg>
+  )
+  return (
+    <svg {...s} viewBox="0 0 20 20" aria-hidden="true">
+      <rect x="2"   y="6" width="3.5" height="10" rx="1.5" fill={color} opacity="0.7"/>
+      <rect x="14.5" y="6" width="3.5" height="10" rx="1.5" fill={color} opacity="0.7"/>
+      <rect x="5.5" y="7" width="9"   height="8"  rx="1"   fill={color}/>
+      <circle cx="10" cy="11" r="2.2" fill="none" stroke={color} strokeWidth="1.2" opacity="0.8"/>
+      <line x1="10" y1="7" x2="10" y2="4" stroke={color} strokeWidth="1.2"/>
+      <circle cx="10" cy="3" r="1.3" fill={color}/>
+    </svg>
+  )
+}
+
 export const metadata: Metadata = {
   title:       'QA Results — Mission Control QA Stack',
   description: '291 Playwright tests · 4 mission profiles · K6 500 VU · Lighthouse 98/100 · OWASP ZAP 0 High — full QA observability for the Mission Control GCS demo.',
@@ -28,8 +74,8 @@ const FEATURES = [
   { id: '02', title: 'Command Dispatch',        desc: 'RTH, HOLD, EMERGENCY_LAND, GOTO. Commands traverse a simulated 50–200 ms datalink with 2% packet-loss probability and ACK/TIMEOUT feedback.' },
   { id: '03', title: 'Datalink Monitoring',     desc: 'Real-time latency, RSSI, and packet-loss metrics with visual degradation indicators, history bar chart, and EW mode stress-test.' },
   { id: '04', title: 'Mission Timeline',        desc: 'Append-only event log with severity levels. Every waypoint, command, and anomaly is timestamped and categorised.' },
-  { id: '05', title: 'QA-Ready Architecture',  desc: 'Deterministic simulator core, typed command bus, isolated Zustand store — built from the ground up for E2E, load, and security testing.' },
-  { id: '06', title: 'Full Test Coverage',      desc: '291 Playwright tests across Chromium · Firefox · WebKit — including 4-profile matrix (Aerial · Ground · Maritime · UGV). K6 load: p95=198ms, 0% fail. Lighthouse: Perf 98, A11y 100.' },
+  { id: '05', title: 'QA-Ready Architecture',  desc: 'Deterministic simulator core, typed command bus, isolated Zustand store, built from the ground up for E2E, load, and security testing.' },
+  { id: '06', title: 'Full Test Coverage',      desc: '291 Playwright tests across Chromium · Firefox · WebKit, including 4-profile matrix (Aerial · Ground · Maritime · UGV). K6 load: p95=198ms, 0% fail. Lighthouse: Perf 98, A11y 100.' },
 ]
 
 const STACK = [
@@ -188,42 +234,42 @@ export default function QAPage() {
         <SectionBox accent={C.pink}>
           <SectionTitle color={C.pink}>Multi-Profile Coverage — 4 Operational Contexts</SectionTitle>
           <p style={{ fontSize: '13px', color: C.tSec, lineHeight: 1.7, marginBottom: '20px', maxWidth: '700px' }}>
-            The same GCS framework is validated across four distinct operational theatres. Switching profiles reloads the fleet, updates telemetry labels, resets the map centre, and replaces vehicle callsigns — all without changing the underlying architecture.
+            The same GCS framework is validated across four distinct operational theatres. Switching profiles reloads the fleet, updates telemetry labels, resets the map centre, and replaces vehicle callsigns, without changing the underlying architecture.
           </p>
           <div className="qa-grid-4" style={{ marginBottom: '20px' }}>
             {[
               {
-                emoji: '✈', label: 'Aerial Surveillance', profile: 'aerial',
+                label: 'Aerial Surveillance', profile: 'aerial',
                 vehicles: 'FALCON-1 · VIPER-2 · HAWK-3 · GHOST-4 · RAVEN-5',
                 area: 'Paris CDG — zoom 12',
                 energy: 'BATTERY', extra: 'ALT AGL · GND SPD',
                 tests: 9, color: C.cyan,
               },
               {
-                emoji: '🚛', label: 'Ground Convoy', profile: 'ground',
+                label: 'Ground Convoy', profile: 'ground',
                 vehicles: 'SCOUT-1 · GUARDIAN-2 · SENTINEL-3 · RANGER-4 · NOMAD-5',
                 area: 'Satory / Versailles — zoom 14',
                 energy: 'FUEL', extra: 'SPD OVR GND · TIRE PSI',
                 tests: 9, color: C.amber,
               },
               {
-                emoji: '⚓', label: 'Maritime Patrol', profile: 'maritime',
+                label: 'Maritime Patrol', profile: 'maritime',
                 vehicles: 'POSEIDON-1 · KRAKEN-2 · NEPTUNE-3 · TRITON-4 · NEREIDE-5',
                 area: 'Brest harbour — zoom 12',
-                energy: 'BATTERY', extra: 'DEPTH · WAVE HT · CURRENT',
+                energy: 'FUEL', extra: 'DEPTH · WAVE HT · CURRENT',
                 tests: 9, color: C.purple,
               },
               {
-                emoji: '🤖', label: 'UGV Recon', profile: 'ugv',
+                label: 'UGV Recon', profile: 'ugv',
                 vehicles: 'MULE-1 · WOLF-2 · BEAR-3 · FOX-4 · LYNX-5',
                 area: 'Mourmelon — zoom 15',
                 energy: 'BATTERY', extra: 'ARMOR · CLRNCE · PAYLOAD',
                 tests: 9, color: C.green,
               },
-            ].map(({ emoji, label, profile, vehicles, area, energy, extra, tests, color }) => (
+            ].map(({ label, profile, vehicles, area, energy, extra, tests, color }) => (
               <div key={profile} style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${color}33`, borderTop: `2px solid ${color}`, padding: '18px' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '18px' }}>{emoji}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <ProfileSvg profile={profile} color={color} size={18} />
                   <span style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '11px', letterSpacing: '2px', color, fontWeight: 700, textTransform: 'uppercase' as const }}>{label}</span>
                 </div>
                 <div style={{ fontSize: '12px', color: C.tMut, marginBottom: '6px', lineHeight: 1.7 }}>{vehicles}</div>

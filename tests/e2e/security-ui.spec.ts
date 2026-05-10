@@ -146,7 +146,7 @@ test.describe('Secret Hygiene', () => {
       }
     })
 
-    await page.goto('/demo')
+    await page.goto('/mission-control/demo')
     await page.waitForTimeout(1_000)
 
     // Check each captured chunk

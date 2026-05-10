@@ -2,7 +2,7 @@ import { type Page, expect } from '@playwright/test'
 
 /** Navigate to the GCS demo and wait until the page is interactive. */
 export async function gotoDemo(page: Page, { e2e = false } = {}) {
-  const url = e2e ? '/demo?__e2e=1' : '/demo'
+  const url = e2e ? '/mission-control/demo?__e2e=1' : '/mission-control/demo'
   // networkidle ensures all JS bundles are loaded and executed before we start
   // checking state — this is critical for the Next.js production build where
   // chunk loading happens asynchronously after the initial HTML.
