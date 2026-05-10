@@ -29,7 +29,7 @@ jobs:
       - run: npm run type-check
       - run: npm run lint
 
-  # ── Build once, upload artifact ───────────────────────────────────────────────
+  # ── Build once, tar it up, upload artifact ────────────────────────────────────
   build:
     name: Production Build
     runs-on: ubuntu-latest
@@ -40,23 +40,20 @@ jobs:
         with: { node-version: '20', cache: 'npm' }
       - run: npm ci
       - run: npm run build
-      - name: Verify build output
+      - name: Archive build output
         run: |
-          echo "=== workspace ==="
-          ls -la
-          echo "=== .next/ must exist ==="
-          ls -la .next/ || (echo "ERROR: .next/ missing after build" && exit 1)
-          echo "=== .next/ size ==="
-          du -sh .next/
-          echo "=== .next/cache/ size ==="
-          du -sh .next/cache/ || echo "no cache dir"
-          echo "=== public/ ==="
-          ls -la public/ || echo "no public dir"
+          echo "=== build output ==="
+          find .next -maxdepth 2 -not -path '*/.next/cache*' | head -30
+          echo "=== file count (excl cache) ==="
+          find .next -type f -not -path '*/.next/cache*' | wc -l
+          echo "=== creating tar ==="
+          tar -czf nextjs-build.tar.gz --exclude='.next/cache' .next/
+          ls -lh nextjs-build.tar.gz
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: nextjs-build-${{ github.sha }}
-          path: .next/
+          path: nextjs-build.tar.gz
           if-no-files-found: error
           retention-days: 1
 
@@ -79,6 +76,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nextjs-build-${{ github.sha }}
+      - name: Extract build
+        run: tar -xzf nextjs-build.tar.gz && ls -la .next/
       - name: Install Playwright browser
         run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Run E2E tests
