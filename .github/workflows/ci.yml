@@ -40,11 +40,18 @@ jobs:
         with: { node-version: '20', cache: 'npm' }
       - run: npm ci
       - run: npm run build
-      - name: Verify build output and size
+      - name: Verify build output
         run: |
-          echo "=== .next/ size ===" && du -sh .next/ || echo ".next not found"
-          echo "=== .next/cache/ size ===" && du -sh .next/cache/ || echo "no cache"
-          echo "=== .next/ (excl cache) ===" && du -sh --exclude=.next/cache .next/ || true
+          echo "=== workspace ==="
+          ls -la
+          echo "=== .next/ must exist ==="
+          ls -la .next/ || (echo "ERROR: .next/ missing after build" && exit 1)
+          echo "=== .next/ size ==="
+          du -sh .next/
+          echo "=== .next/cache/ size ==="
+          du -sh .next/cache/ || echo "no cache dir"
+          echo "=== public/ ==="
+          ls -la public/ || echo "no public dir"
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
