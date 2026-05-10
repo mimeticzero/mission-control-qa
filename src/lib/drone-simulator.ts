@@ -9,6 +9,7 @@ import type {
   CommandType,
 } from './types'
 import type { DroneSimConfig } from './fleet-config'
+import { FLEET_CONFIG } from './fleet-config'
 
 // ─── Paris CDG — kept for MapView backward compat ────────────────────────────
 
@@ -351,8 +352,6 @@ export class DroneSimulator {
   private readonly TICK_MS = 400
 
   constructor(private readonly cb: SimulatorCallback) {
-    // Matches the original FALCON-1 config
-    const { FLEET_CONFIG } = require('./fleet-config') as { FLEET_CONFIG: DroneSimConfig[] }
     this.sim = new DroneSim(FLEET_CONFIG[0])
   }
 
@@ -375,10 +374,7 @@ export class DroneSimulator {
 
   reset() {
     this.stop()
-    this.sim = (() => {
-      const { FLEET_CONFIG } = require('./fleet-config') as { FLEET_CONFIG: DroneSimConfig[] }
-      return new DroneSim(FLEET_CONFIG[0])
-    })()
+    this.sim = new DroneSim(FLEET_CONFIG[0])
   }
 
   sendCommand(
