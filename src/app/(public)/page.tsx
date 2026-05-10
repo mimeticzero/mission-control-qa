@@ -83,7 +83,8 @@ export default function LandingPage() {
         </div>
         <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
           <Link href="/demo" style={{ fontSize: '11px', letterSpacing: '3px', color: C.textMuted, textDecoration: 'none' }}>DEMO</Link>
-          <Link href="/docs" style={{ fontSize: '11px', letterSpacing: '3px', color: C.textMuted, textDecoration: 'none' }}>DOCS</Link>
+          <Link href="/qa"   style={{ fontSize: '11px', letterSpacing: '3px', color: C.textMuted, textDecoration: 'none' }}>QA RESULTS</Link>
+          <a href="https://github.com/mimeticzero/mission-control-qa" target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', letterSpacing: '3px', color: C.textMuted, textDecoration: 'none' }}>GITHUB</a>
           <a href="https://sakuranode.com" style={{ fontSize: '11px', letterSpacing: '3px', color: C.textMuted, textDecoration: 'none' }}>← SAKURANODE</a>
         </div>
       </nav>
@@ -179,9 +180,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ padding: '28px clamp(16px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderTop: `1px solid ${C.border}` }}>
+      <footer style={{ padding: '28px clamp(16px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', borderTop: `1px solid ${C.border}` }}>
         <span style={{ fontSize: '11px', color: C.textMuted, letterSpacing: '2px' }}>MISSION CONTROL QA STACK — EDUCATIONAL PROJECT</span>
-        <a href="https://sakuranode.com" style={{ fontSize: '11px', letterSpacing: '2px', color: C.textMuted, textDecoration: 'none' }}>← SAKURANODE.COM</a>
+        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+          <a href="https://sakuranode.com/engineering-dashboard" style={{ fontSize: '11px', letterSpacing: '2px', color: C.cyan, textDecoration: 'none' }}>→ Engineering Dashboard</a>
+          <a href="https://sakuranode.com" style={{ fontSize: '11px', letterSpacing: '2px', color: C.textMuted, textDecoration: 'none' }}>← Sakuranode.com</a>
+        </div>
       </footer>
 
       <style>{`

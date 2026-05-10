@@ -146,7 +146,7 @@ function HUDHeader({ isSimulating, ewMode, onToggleEw }: HUDHeaderProps) {
           <div className="h-4 w-px bg-gcs-border" />
           <div className="text-gcs-dim tabular-nums">{now}</div>
           <a
-            href="/"
+            href="/mission-control"
             className="ml-2 border border-gcs-border px-2 py-1 text-[9px] text-gcs-muted
                        hover:border-gcs-cyan hover:text-gcs-cyan transition-colors tracking-widest"
           >
