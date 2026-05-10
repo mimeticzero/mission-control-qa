@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { TestTable } from './TestTable'
 
 export const metadata: Metadata = {
   title:       'QA Results — Mission Control QA Stack',
@@ -101,7 +102,7 @@ export default function QAPage() {
       </div>
 
       {/* ── NAV ── */}
-      <nav style={{ borderBottom: `1px solid ${C.border}`, padding: '14px clamp(16px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+      <nav style={{ borderBottom: `1px solid ${C.border}`, padding: '14px clamp(16px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '24px' }}>
         <span style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '12px', letterSpacing: '3px', color: C.cyan, fontWeight: 700 }}>MISSION CONTROL QA</span>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Link href="/demo" style={{ fontSize: '12px', letterSpacing: '3px', color: C.tMut, textDecoration: 'none', border: `1px solid ${C.border}`, padding: '6px 14px' }}>DEMO</Link>
@@ -179,51 +180,7 @@ export default function QAPage() {
           </div>
 
           {/* ── TEST SCENARIO TABLE ── */}
-          <div style={{ marginTop: '28px' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '12px' }}>
-              <div style={{ fontSize: '12px', letterSpacing: '2px', color: C.tDim }}>REPRESENTATIVE TEST SCENARIOS</div>
-              <div style={{ fontSize: '12px', color: C.tMut }}>14 of 207 — <a href="https://github.com/mimeticzero/mission-control-qa" target="_blank" rel="noopener noreferrer" style={{ color: C.green, textDecoration: 'none' }}>full suite on GitHub ↗</a></div>
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', minWidth: '480px' }}>
-                <thead>
-                  <tr style={{ borderBottom: `1px solid rgba(0,245,255,0.2)` }}>
-                    <th style={{ textAlign: 'left', padding: '8px 14px', letterSpacing: '2px', color: C.tDim, fontWeight: 400 }}>SUITE</th>
-                    <th style={{ textAlign: 'left', padding: '8px 14px', letterSpacing: '2px', color: C.tDim, fontWeight: 400 }}>SCENARIO</th>
-                    <th style={{ textAlign: 'center', padding: '8px 14px', letterSpacing: '2px', color: C.tDim, fontWeight: 400, width: '80px' }}>STATUS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { suite: 'Telemetry',  scenario: 'Drone position updates on map within 200ms of state change',         pass: true },
-                    { suite: 'Telemetry',  scenario: 'Battery level below 20% triggers low-battery warning indicator',      pass: true },
-                    { suite: 'Telemetry',  scenario: 'RSSI drop below −90 dBm shows signal-lost overlay',                  pass: true },
-                    { suite: 'Commands',   scenario: 'RTH command dispatched and ACK received within simulated datalink',   pass: true },
-                    { suite: 'Commands',   scenario: 'EMERGENCY_LAND disables all other command buttons immediately',        pass: true },
-                    { suite: 'Commands',   scenario: 'TIMEOUT on packet loss shows retry feedback in mission timeline',     pass: true },
-                    { suite: 'EW Mode',    scenario: 'EW stress-test degrades RSSI and injects latency spikes',             pass: true },
-                    { suite: 'EW Mode',    scenario: 'Returning to normal mode restores telemetry within 3 seconds',        pass: true },
-                    { suite: 'Datalink',   scenario: 'Latency bar chart renders 60 history ticks without overflow',         pass: true },
-                    { suite: 'Datalink',   scenario: 'Packet-loss counter increments on simulated drop event',              pass: true },
-                    { suite: 'A11y',       scenario: 'All interactive controls reachable by keyboard (Tab order correct)',  pass: true },
-                    { suite: 'A11y',       scenario: 'Color contrast ratio ≥ 4.5:1 on all text elements (WCAG AA)',         pass: true },
-                    { suite: 'Navigation', scenario: 'Page renders without layout shift on Chromium, Firefox, WebKit',      pass: true },
-                    { suite: 'Navigation', scenario: 'Nav links resolve to correct routes with no 404 responses',           pass: true },
-                  ].map(({ suite, scenario, pass }, i) => (
-                    <tr key={i} style={{ borderBottom: `1px solid rgba(255,255,255,0.04)`, background: i % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent' }}>
-                      <td style={{ padding: '10px 14px', color: C.cyan, fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', letterSpacing: '1px', whiteSpace: 'nowrap', verticalAlign: 'top' }}>{suite}</td>
-                      <td style={{ padding: '10px 14px', color: C.tSec, lineHeight: 1.5, verticalAlign: 'top' }}>{scenario}</td>
-                      <td style={{ padding: '10px 14px', textAlign: 'center', verticalAlign: 'top' }}>
-                        <span style={{ fontSize: '12px', letterSpacing: '2px', padding: '3px 8px', border: `1px solid ${pass ? C.green : C.pink}44`, color: pass ? C.green : C.pink, fontWeight: 700 }}>
-                          {pass ? 'PASS' : 'FAIL'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <TestTable />
         </SectionBox>
 
         {/* ── K6 LOAD ── */}
