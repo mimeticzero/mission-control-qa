@@ -113,12 +113,12 @@ export default function QAPage() {
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px clamp(16px,4vw,48px) 80px' }}>
 
         {/* ── PAGE HEADER ── */}
-        <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+        <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <div style={{ fontSize: '12px', letterSpacing: '5px', color: C.cyan, marginBottom: '12px', opacity: 0.7 }}>QA OBSERVABILITY STACK · MISSION CONTROL</div>
-          <h1 style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: 'clamp(20px,3vw,32px)', fontWeight: 700, letterSpacing: '2px', color: C.tPri, marginBottom: '10px' }}>
+          <h1 style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: 'clamp(22px,3vw,36px)', fontWeight: 700, letterSpacing: '4px', color: C.tPri, marginBottom: '10px', lineHeight: 1.2 }}>
             QA Results
           </h1>
-          <p style={{ fontSize: '13px', color: C.tSec, lineHeight: 1.7, maxWidth: '600px', margin: '0 auto' }}>
+          <p style={{ fontSize: '13px', color: C.tSec, lineHeight: 1.7, maxWidth: '600px' }}>
             Live test metrics for the Mission Control GCS demo — Playwright E2E, K6 load, Lighthouse audits, and OWASP ZAP security scan.
           </p>
         </div>
