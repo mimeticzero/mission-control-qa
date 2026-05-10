@@ -1,0 +1,59 @@
+name: Security Scan (OWASP ZAP)
+
+on:
+  schedule:
+    # Every Monday at 03:00 UTC
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+jobs:
+  zap-scan:
+    name: OWASP ZAP Baseline Scan
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write   # ZAP action opens issues on findings
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install & build
+        run: |
+          npm ci
+          npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: 'https://placeholder.supabase.co'
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'placeholder-key'
+          NEXT_PUBLIC_DEMO_MODE: 'true'
+
+      - name: Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for app to be ready
+        run: |
+          timeout 30 sh -c 'until curl -sf http://localhost:3000; do sleep 1; done'
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target:        'http://localhost:3000'
+          rules_file_name: tests/security/zap-rules.tsv
+          cmd_options:   '-a -j -l WARN'
+          fail_action:   'false'  # Don't fail CI on findings — report only
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-${{ github.run_number }}
+          path: |
+            report_html.html
+            report_json.json
+          retention-days: 30

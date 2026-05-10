@@ -1,0 +1,84 @@
+name: Lighthouse CI
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    # Daily at 04:00 UTC
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL:      https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-key
+          NEXT_PUBLIC_DEMO_MODE:         'true'
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli
+
+      - name: Start server
+        run: npm start &
+
+      - name: Wait for server
+        run: timeout 30 sh -c 'until curl -sf http://localhost:3000; do sleep 1; done'
+
+      - name: Run Lighthouse CI
+        run: lhci autorun --config=tests/lighthouse/lighthouserc.js
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results-${{ github.run_number }}
+          path: .lighthouseci/
+          retention-days: 30
+
+      # Comment Lighthouse results on PR
+      - name: Find PR comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- lighthouse-ci -->'
+
+      - name: Post Lighthouse summary on PR
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id:        ${{ steps.find-comment.outputs.comment-id }}
+          issue-number:      ${{ github.event.pull_request.number }}
+          edit-mode:         replace
+          body: |
+            <!-- lighthouse-ci -->
+            ## Lighthouse CI Results
+
+            Audit ran against: `/`, `/docs`, `/demo`
+
+            | Page     | Perf | A11y | Best Practices | SEO |
+            |----------|------|------|---------------|-----|
+            | /        | 🔍 see artifact | 🔍 | 🔍 | 🔍 |
+            | /docs    | 🔍 | 🔍 | 🔍 | 🔍 |
+            | /demo    | 🔍 (JS-heavy) | 🔍 | 🔍 | 🔍 |
+
+            **Thresholds:** Perf ≥90 (landing), ≥70 (demo) · A11y ≥95 (landing), ≥90 (demo) · Best Practices ≥95 · SEO ≥90
+
+            → Full report in [workflow artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

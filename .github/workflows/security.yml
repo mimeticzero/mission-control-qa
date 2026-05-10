@@ -1,0 +1,86 @@
+name: Security Scan (OWASP ZAP)
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Scan mode'
+        required: false
+        default: 'baseline'
+        type: choice
+        options: [baseline, full]
+
+jobs:
+  zap-scan:
+    name: OWASP ZAP ${{ inputs.mode || 'baseline' }} Scan
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write   # ZAP action creates GitHub issues for findings
+      contents: write # For committing reports
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+
+      - name: Install & Build
+        run: npm ci && npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL:      https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-key
+          NEXT_PUBLIC_DEMO_MODE:         'true'
+
+      - name: Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for application
+        run: timeout 30 sh -c 'until curl -sf http://localhost:3000; do sleep 1; done'
+
+      # Baseline scan (passive) — runs on every schedule
+      - name: ZAP Baseline Scan
+        if: ${{ inputs.mode != 'full' }}
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target:          'http://localhost:3000'
+          rules_file_name: 'tests/security/zap-rules.tsv'
+          cmd_options:     '-a -j -l WARN'
+          fail_action:     'false'
+
+      # Full scan (active) — only on manual trigger with mode=full
+      - name: ZAP Full Active Scan
+        if: ${{ inputs.mode == 'full' }}
+        uses: zaproxy/action-full-scan@v0.10.0
+        with:
+          target:          'http://localhost:3000'
+          rules_file_name: 'tests/security/zap-rules.tsv'
+          cmd_options:     '-a -j -l WARN'
+          fail_action:     'false'
+
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-${{ github.run_number }}-${{ github.run_attempt }}
+          path: |
+            report_html.html
+            report_json.json
+          retention-days: 90
+
+      # Commit report to repository for historical tracking
+      - name: Commit scan report to reports/zap/
+        if: always() && github.event_name == 'schedule'
+        run: |
+          mkdir -p reports/zap
+          DATE=$(date -u +%Y-%m-%d)
+          cp report_json.json "reports/zap/${DATE}.json" 2>/dev/null || true
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports/zap/
+          git diff --staged --quiet || git commit -m "chore: ZAP scan report ${DATE} [skip ci]"
+          git push

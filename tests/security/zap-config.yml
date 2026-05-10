@@ -1,0 +1,99 @@
+# OWASP ZAP Configuration — Mission Control QA Stack
+# Used by: .github/workflows/security.yml (weekly scan)
+#
+# Scope: full application including all routes and API endpoints.
+# Mode: passive scan (always) + active scan (on-demand / staging only).
+#
+# Reference: https://www.zaproxy.org/docs/automate/automation-framework/
+
+env:
+  contexts:
+    - name: mission-control-qa
+      urls:
+        - "http://localhost:3000"
+      includePaths:
+        - "http://localhost:3000/.*"
+      excludePaths:
+        # Exclude Leaflet static tile fetches (external CDN)
+        - "https://.*\\.cartocdn\\.com/.*"
+        - "https://.*\\.openstreetmap\\.org/.*"
+        # Exclude Google Fonts (external)
+        - "https://fonts\\.gstatic\\.com/.*"
+        - "https://fonts\\.googleapis\\.com/.*"
+      authentication:
+        method: none  # Demo app has no authentication layer
+
+  parameters:
+    failOnError: false    # Report findings; don't fail CI pipeline on warnings
+    failOnWarning: false
+    progressToStdout: true
+
+jobs:
+  # ── 1. Spider — discover all routes ────────────────────────────────────────
+  - type: spider
+    parameters:
+      context: mission-control-qa
+      url: "http://localhost:3000"
+      maxDuration: 5        # minutes
+      maxDepth: 10
+      acceptCookies: false  # Demo app has no cookie-based session
+
+  # ── 2. Ajax Spider — discover JS-rendered routes ───────────────────────────
+  - type: spiderAjax
+    parameters:
+      context: mission-control-qa
+      url: "http://localhost:3000"
+      maxDuration: 3        # minutes
+      browserId: chrome-headless
+
+  # ── 3. Passive Scan — analyse all discovered traffic ──────────────────────
+  - type: passiveScan
+    parameters:
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+
+  # ── 4. Active Scan — probe for vulnerabilities ────────────────────────────
+  #    NOTE: only run against the staging environment, NOT production.
+  #    In CI this targets localhost started in the same job.
+  - type: activeScan
+    parameters:
+      context: mission-control-qa
+      policy: Default Policy
+      maxRuleDurationInMins: 2
+      maxScanDurationInMins: 30
+
+  # ── 5. Reports ──────────────────────────────────────────────────────────────
+  - type: report
+    parameters:
+      template: traditional-html
+      reportDir: /zap/reports
+      reportFile: mission-control-qa-report.html
+      reportTitle: "Mission Control QA — Security Scan"
+      reportDescription: "Weekly OWASP ZAP scan — educational demo"
+
+  - type: report
+    parameters:
+      template: traditional-json
+      reportDir: /zap/reports
+      reportFile: mission-control-qa-report.json
+
+# ── Alert filter — suppress known non-findings for this project ────────────────
+alertFilters:
+  # Demo app uses unsafe-inline for Next.js + Leaflet (documented trade-off)
+  - ruleId: 10055  # CSP: Wildcard Directive
+    newRisk: Informational
+  - ruleId: 10038  # Content Security Policy (CSP) Header Not Set
+    newRisk: Informational
+    # CSP IS set — ZAP flags it due to unsafe-inline presence
+    url: "http://localhost:3000/.*"
+    method: ""
+    parameter: ""
+    evidence: ""
+    attack: ""
+    count: -1
+
+  # No HTTPS on localhost (expected)
+  - ruleId: 10035  # Strict-Transport-Security Header Not Set
+    newRisk: Informational
+    url: "http://localhost:3000/.*"
+    count: -1

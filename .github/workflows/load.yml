@@ -1,0 +1,84 @@
+name: Load Tests (K6)
+
+on:
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Which test to run'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, telemetry-stress, command-burst, datalink-recovery]
+      base_url:
+        description: 'Target base URL (default: local)'
+        required: false
+        default: 'http://localhost:3000'
+
+jobs:
+  load-test:
+    name: K6 Load Test — ${{ inputs.test }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+
+      # Install K6
+      - name: Install K6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring \
+            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 \
+            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+            | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      # Build & start the app if using localhost
+      - name: Build application
+        if: contains(inputs.base_url, 'localhost')
+        run: npm ci && npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL:      https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-key
+          NEXT_PUBLIC_DEMO_MODE:         'true'
+
+      - name: Start application
+        if: contains(inputs.base_url, 'localhost')
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for application
+        if: contains(inputs.base_url, 'localhost')
+        run: timeout 30 sh -c 'until curl -sf http://localhost:3000; do sleep 1; done'
+
+      - name: Create test-results directory
+        run: mkdir -p test-results
+
+      # Run selected tests
+      - name: K6 — Telemetry Stress
+        if: inputs.test == 'all' || inputs.test == 'telemetry-stress'
+        run: k6 run tests/load/telemetry-stress.js --env BASE_URL=${{ inputs.base_url }}
+        continue-on-error: true
+
+      - name: K6 — Command Burst
+        if: inputs.test == 'all' || inputs.test == 'command-burst'
+        run: k6 run tests/load/command-burst.js --env BASE_URL=${{ inputs.base_url }}
+        continue-on-error: true
+
+      - name: K6 — Datalink Recovery
+        if: inputs.test == 'all' || inputs.test == 'datalink-recovery'
+        run: k6 run tests/load/datalink-recovery.js --env BASE_URL=${{ inputs.base_url }}
+        continue-on-error: true
+
+      - name: Upload K6 results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-results-${{ github.run_number }}
+          path: test-results/
+          retention-days: 30
