@@ -72,6 +72,8 @@ tests/
 
 ### E2E scenarios (Playwright)
 
+69 scenarios x 3 browsers (Chromium, Firefox, WebKit) on Ubuntu = 207 tests.
+
 - User dispatches `RTH`: drone heading changes on map within 2 s
 - User dispatches `EMERGENCY_LAND`: `CRITICAL` event appears in timeline
 - Battery drops below 15 %: status badge turns red, alert logged

@@ -126,7 +126,7 @@ export default function QAPage() {
 
         {/* ── 4 KEY METRICS ── */}
         <div className="qa-grid-4" style={{ marginBottom: '32px' }}>
-          <StatCard value="207"   label="Playwright tests" sub="100% pass · 3 browsers"       accent={C.cyan}   tooltip="207 E2E tests run across Chromium, Firefox, and WebKit. 69 tests per browser. All pass with 0 failures." />
+          <StatCard value="207"   label="Playwright tests" sub="100% pass · 3 browsers"       accent={C.cyan}   tooltip="207 E2E tests: 69 scenarios x Chromium, Firefox, WebKit on Ubuntu. All pass with 0 failures." />
           <StatCard value="198ms" label="K6 p95 latency"   sub="500 VU · 0% fail · 210.9 rps" accent={C.purple} tooltip="p95 = 95th-percentile latency: 95% of requests completed in under 198ms under 500 concurrent virtual users." />
           <StatCard value="98"    label="Lighthouse perf"  sub="A11y 100 · SEO 92 · BP 100"   accent={C.amber}  tooltip="Google Lighthouse performance score out of 100. Audits FCP, LCP, TBT, CLS, and Speed Index. 98 = excellent." />
           <StatCard value="0"     label="ZAP high vulns"   sub="2 Medium · 6 Low · CSP active" accent={C.green}  tooltip="OWASP ZAP automated security scan: 0 High, 2 Medium, 6 Low severity findings. Content-Security-Policy active." />
