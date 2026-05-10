@@ -22,6 +22,26 @@ const C = {
   tDim:    '#64748b',
 }
 
+const FEATURES = [
+  { id: '01', title: 'Live Drone Simulation',  desc: 'Paris CDG patrol route with interpolated GPS, telemetry noise, and battery drain. Runs entirely client-side via a deterministic state machine.' },
+  { id: '02', title: 'Command Dispatch',        desc: 'RTH, HOLD, EMERGENCY_LAND, GOTO. Commands traverse a simulated 50–200 ms datalink with 2% packet-loss probability and ACK/TIMEOUT feedback.' },
+  { id: '03', title: 'Datalink Monitoring',     desc: 'Real-time latency, RSSI, and packet-loss metrics with visual degradation indicators, history bar chart, and EW mode stress-test.' },
+  { id: '04', title: 'Mission Timeline',        desc: 'Append-only event log with severity levels. Every waypoint, command, and anomaly is timestamped and categorised.' },
+  { id: '05', title: 'QA-Ready Architecture',  desc: 'Deterministic simulator core, typed command bus, isolated Zustand store — built from the ground up for E2E, load, and security testing.' },
+  { id: '06', title: 'Full Test Coverage',      desc: '207 Playwright tests across Chromium · Firefox · WebKit. K6 load: p95=198ms, 0% fail. Lighthouse: Perf 98, A11y 100.' },
+]
+
+const STACK = [
+  { name: 'Next.js 15',    desc: 'App Router, RSC, Server Actions' },
+  { name: 'TypeScript',    desc: 'Strict mode end-to-end' },
+  { name: 'Tailwind CSS',  desc: 'Utility-first, dark-theme design' },
+  { name: 'react-leaflet', desc: 'Open-source mapping, no API key' },
+  { name: 'Recharts',      desc: 'Real-time telemetry graphs' },
+  { name: 'Zustand',       desc: 'Lightweight reactive state' },
+  { name: 'Playwright',    desc: '207 tests — 3 browsers' },
+  { name: 'K6',            desc: 'Load: 500 VU, 0% fail rate' },
+]
+
 function StatCard({ value, label, sub, accent }: { value: string; label: string; sub?: string; accent: string }) {
   return (
     <div style={{ background: C.surface, border: `1px solid ${C.pBorder}`, borderTop: `2px solid ${accent}`, padding: '20px', textAlign: 'center' }}>
@@ -82,11 +102,11 @@ export default function QAPage() {
 
       {/* ── NAV ── */}
       <nav style={{ borderBottom: `1px solid ${C.border}`, padding: '14px clamp(16px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-        <Link href="/" style={{ fontSize: '12px', letterSpacing: '3px', color: C.cyan, textDecoration: 'none', fontWeight: 700, border: `1px solid ${C.cyan}44`, padding: '6px 14px' }}>← Mission Control</Link>
+        <span style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '12px', letterSpacing: '3px', color: C.cyan, fontWeight: 700 }}>MISSION CONTROL QA</span>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Link href="/demo" style={{ fontSize: '12px', letterSpacing: '3px', color: C.tMut, textDecoration: 'none', border: `1px solid ${C.border}`, padding: '6px 14px' }}>DEMO</Link>
           <a href="https://github.com/mimeticzero/mission-control-qa" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', letterSpacing: '3px', color: C.tMut, textDecoration: 'none', border: `1px solid ${C.border}`, padding: '6px 14px' }}>GITHUB</a>
-          <a href="https://sakuranode.com/engineering-dashboard" style={{ fontSize: '12px', letterSpacing: '3px', color: C.tMut, textDecoration: 'none', border: `1px solid ${C.border}`, padding: '6px 14px' }}>→ Engineering Dashboard</a>
+          <a href="https://sakuranode.com/hire" style={{ fontSize: '12px', letterSpacing: '3px', color: C.cyan, textDecoration: 'none', border: `1px solid ${C.cyan}44`, padding: '6px 14px', fontWeight: 700 }}>→ Hire Me</a>
         </div>
       </nav>
 
@@ -176,9 +196,9 @@ export default function QAPage() {
             <div>
               <div style={{ fontSize: '12px', letterSpacing: '3px', color: C.tDim, marginBottom: '12px' }}>VU RAMP PROFILE</div>
               {[
-                { phase: '0 → 1 min',   vu: '0 → 500',      width: '100%', color: C.purple },
-                { phase: '1 → 2 min',   vu: '500 (steady)', width: '100%', color: C.purple },
-                { phase: '2 → 3 min',   vu: '500 → 0',      width: '100%', color: C.purple },
+                { phase: '0 → 1 min', vu: '0 → 500',      width: '100%', color: C.purple },
+                { phase: '1 → 2 min', vu: '500 (steady)', width: '100%', color: C.purple },
+                { phase: '2 → 3 min', vu: '500 → 0',      width: '100%', color: C.purple },
               ].map(({ phase, vu, width, color }) => (
                 <div key={phase} style={{ marginBottom: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: C.tMut, marginBottom: '4px' }}>
@@ -267,7 +287,6 @@ export default function QAPage() {
             </div>
             <span style={{ color: C.green, fontSize: '18px', marginLeft: '16px', flexShrink: 0 }}>↗</span>
           </a>
-
           <Link href="/demo"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: `${C.cyan}04`, border: `1px solid ${C.cyan}33`, textDecoration: 'none', color: C.tPri }}>
             <div>
@@ -276,30 +295,66 @@ export default function QAPage() {
             </div>
             <span style={{ color: C.cyan, fontSize: '18px', marginLeft: '16px', flexShrink: 0 }}>→</span>
           </Link>
-
-          <a href="https://sakuranode.com/engineering-dashboard"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'rgba(255,255,255,0.02)', border: `1px solid ${C.border}`, textDecoration: 'none', color: C.tPri }}>
+          <a href="https://sakuranode.com/hire"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: `${C.pink}04`, border: `1px solid ${C.pink}33`, textDecoration: 'none', color: C.tPri }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '12px', letterSpacing: '2px', color: C.tPri, marginBottom: '4px' }}>ENGINEERING DASHBOARD</div>
-              <div style={{ fontSize: '12px', color: C.tMut }}>Full QA stack · all 5 SaaS services</div>
+              <div style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '12px', letterSpacing: '2px', color: C.pink, marginBottom: '4px' }}>HIRE ME</div>
+              <div style={{ fontSize: '12px', color: C.tMut }}>SDET / QA Architect · 600–800€/day</div>
             </div>
-            <span style={{ color: C.tMut, fontSize: '18px', marginLeft: '16px', flexShrink: 0 }}>→</span>
+            <span style={{ color: C.pink, fontSize: '18px', marginLeft: '16px', flexShrink: 0 }}>→</span>
           </a>
+        </div>
+
+        {/* ── SYSTEM CAPABILITIES ── */}
+        <div style={{ marginTop: '48px' }}>
+          <div style={{ fontSize: '12px', letterSpacing: '4px', color: C.cyan, marginBottom: '24px', opacity: 0.8 }}>SYSTEM CAPABILITIES</div>
+          <div className="mc-grid-3">
+            {FEATURES.map((f) => (
+              <div key={f.id} style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid rgba(155,48,255,0.15)`, borderTop: `2px solid ${C.purple}`, padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '12px', letterSpacing: '2px', color: C.tMut }}>{f.id}</span>
+                  <span style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '12px', letterSpacing: '2px', color: C.cyan, fontWeight: 700 }}>{f.title}</span>
+                </div>
+                <p style={{ fontSize: '13px', color: C.tSec, lineHeight: 1.7, margin: 0 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── TECHNOLOGY STACK ── */}
+        <div style={{ marginTop: '32px' }}>
+          <div style={{ fontSize: '12px', letterSpacing: '4px', color: C.cyan, marginBottom: '24px', opacity: 0.8 }}>TECHNOLOGY STACK</div>
+          <div className="mc-grid-4">
+            {STACK.map((s) => (
+              <div key={s.name} style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid rgba(0,245,255,0.12)`, borderTop: `2px solid ${C.cyan}`, padding: '16px 20px' }}>
+                <div style={{ fontFamily: 'var(--font-orbitron, Orbitron, sans-serif)', fontSize: '12px', letterSpacing: '2px', color: C.tPri, marginBottom: '6px', fontWeight: 700 }}>{s.name}</div>
+                <div style={{ fontSize: '12px', color: C.tMut }}>{s.desc}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>
 
       <style>{`
-        .qa-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .qa-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
-        .qa-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+        .qa-grid-4  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .qa-grid-3  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+        .qa-grid-2  { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+        .mc-grid-3  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .mc-grid-4  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         @media (max-width: 900px) {
           .qa-grid-4 { grid-template-columns: repeat(2, 1fr); }
           .qa-grid-3 { grid-template-columns: 1fr; }
+          .mc-grid-3 { grid-template-columns: repeat(2, 1fr); }
+          .mc-grid-4 { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 600px) {
           .qa-grid-4 { grid-template-columns: repeat(2, 1fr); }
           .qa-grid-2 { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 560px) {
+          .mc-grid-3 { grid-template-columns: 1fr; }
+          .mc-grid-4 { grid-template-columns: repeat(2, 1fr); }
         }
         a:hover { opacity: 0.85; }
       `}</style>
