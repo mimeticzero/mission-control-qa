@@ -31,9 +31,10 @@ export default defineConfig({
     ? [['github'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/results.json' }]]
     : [['html', { open: 'on-failure' }], ['list']],
 
-  // Global test timeout — 20 s is generous for a local Next.js server.
-  // Tests that need telemetry explicitly wait via waitForTelemetry().
-  timeout: 20_000,
+  // Global test timeout — 30 s accommodates profile-specific tests that do
+  // a full networkidle load, waitForSelector, AND waitForTelemetry in sequence.
+  // 20 s proved insufficient on CI when all three waits chain together.
+  timeout: 30_000,
 
   // Shared settings for all tests
   use: {

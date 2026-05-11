@@ -83,8 +83,12 @@ test.describe('Command Dispatch', () => {
     await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
 
-    // Step 2: confirm
-    await page.click('[data-testid="emrg-confirm-btn"]')
+    // Step 2: confirm — wait for the button to be fully stable before clicking.
+    // On webkit CI the dialog briefly re-renders after mounting, detaching the
+    // button from the DOM. Asserting toBeVisible() first lets React settle.
+    const confirmBtn = page.locator('[data-testid="emrg-confirm-btn"]')
+    await expect(confirmBtn).toBeVisible({ timeout: 3_000 })
+    await confirmBtn.click()
 
     // Dialog should dismiss
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).not.toBeVisible({ timeout: 2_000 })

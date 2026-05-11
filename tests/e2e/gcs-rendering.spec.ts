@@ -142,15 +142,16 @@ test.describe('GCS Dashboard Rendering', () => {
   })
 
   test('landing page renders with demo link', async ({ page }) => {
-    // / redirects to /qa — assert on what the QA page actually renders
-    await page.goto('/')
+    // baseURL is http://localhost:3000/mission-control — a leading slash navigates
+    // to the host root, bypassing the basePath. Use full path to stay inside the app.
+    await page.goto('/mission-control')
     await expect(page.getByRole('link', { name: /^DEMO$/i })).toBeVisible()
     await expect(page).toHaveTitle(/Mission Control/)
   })
 
   test('docs page renders navigation and content sections', async ({ page }) => {
-    // /docs redirects to /qa — assert on QA page content
-    await page.goto('/docs')
+    // Same basePath issue: /docs would hit http://localhost:3000/docs → 404
+    await page.goto('/mission-control/docs')
     await expect(page.locator('h1')).toContainText('QA Results')
     await expect(page).toHaveTitle(/Mission Control/)
   })
