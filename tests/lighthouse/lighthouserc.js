@@ -45,25 +45,28 @@ module.exports = {
     },
 
     assert: {
-      // Landing page (/) — high bar
-      assertions: {
-        'categories:performance':        ['error', { minScore: 0.90 }],
-        'categories:accessibility':      ['error', { minScore: 0.95 }],
-        'categories:best-practices':     ['error', { minScore: 0.95 }],
-        'categories:seo':                ['error', { minScore: 0.90 }],
-      },
-
-      // Per-URL overrides for the GCS demo page
+      // assertMatrix is the only valid form when per-URL overrides are needed —
+      // mixing top-level assertions + assertMatrix is not allowed by lhci.
       assertMatrix: [
         {
+          // Landing and docs pages — high bar
+          matchingUrlPattern: '.*/mission-control(/docs)?$',
+          assertions: {
+            'categories:performance':    ['error', { minScore: 0.90 }],
+            'categories:accessibility':  ['error', { minScore: 0.95 }],
+            'categories:best-practices': ['error', { minScore: 0.95 }],
+            'categories:seo':            ['error', { minScore: 0.90 }],
+          },
+        },
+        {
+          // Demo page — relaxed for Performance (Leaflet + Recharts + Zustand)
           matchingUrlPattern: '.*/demo',
           assertions: {
-            // Demo page is JS-heavy by design — reflect this in the budget
             'categories:performance':    ['warn',  { minScore: 0.70 }],
             'categories:accessibility':  ['error', { minScore: 0.90 }],
             'categories:best-practices': ['error', { minScore: 0.90 }],
             'categories:seo':            ['warn',  { minScore: 0.70 }],
-            // Core Web Vitals for a GCS are more nuanced — we warn, not error
+            // Core Web Vitals — warn only for a real-time GCS UI
             'first-contentful-paint':    ['warn',  { maxNumericValue: 2000 }],
             'largest-contentful-paint':  ['warn',  { maxNumericValue: 4000 }],
             'cumulative-layout-shift':   ['error', { maxNumericValue: 0.1  }],
