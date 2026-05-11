@@ -93,11 +93,11 @@ export function MissionProfileSelector({ value, onChange }: MissionProfileSelect
           ▾
         </span>
       </div>
-      {/* Active profile badge — SVG icon */}
+      {/* Active profile badge — SVG icon (decorative) */}
       <span
         data-testid="active-profile-badge"
         className="hidden xl:flex items-center"
-        aria-label={`Active profile: ${current.description}`}
+        aria-hidden="true"
       >
         <ProfileIcon profile={value} size={14} />
       </span>

@@ -147,7 +147,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await expect(page.locator('[data-testid="telemetry-panel"]'))
+    await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('SPD OVR GND', { timeout: 3_000 })
   })
 
@@ -156,7 +156,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await expect(page.locator('[data-testid="telemetry-panel"]'))
+    await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('DEPTH', { timeout: 3_000 })
   })
 
@@ -165,7 +165,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await expect(page.locator('[data-testid="telemetry-panel"]'))
+    await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('CLRNCE', { timeout: 3_000 })
   })
 
@@ -183,7 +183,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await expect(page.locator('[data-testid="telemetry-panel"]'))
+    await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('WAVE HT', { timeout: 3_000 })
   })
 
@@ -192,7 +192,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await expect(page.locator('[data-testid="telemetry-panel"]'))
+    await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('ARMOR', { timeout: 3_000 })
   })
 
@@ -207,8 +207,8 @@ test.describe('Commands Work In All Profiles', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await page.click('[data-testid="cmd-rth"]')
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await page.locator('[data-testid="cmd-rth"]').first().click()
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('RTH', { timeout: 3_000 })
   })
 
@@ -217,8 +217,8 @@ test.describe('Commands Work In All Profiles', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await page.click('[data-testid="cmd-rth"]')
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await page.locator('[data-testid="cmd-rth"]').first().click()
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('RTH', { timeout: 3_000 })
   })
 
@@ -227,8 +227,8 @@ test.describe('Commands Work In All Profiles', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await page.click('[data-testid="cmd-rth"]')
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await page.locator('[data-testid="cmd-rth"]').first().click()
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('RTH', { timeout: 3_000 })
   })
 
@@ -236,8 +236,8 @@ test.describe('Commands Work In All Profiles', () => {
     await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
-    await page.click('[data-testid="cmd-hold"]')
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await page.locator('[data-testid="cmd-hold"]').first().click()
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('HOLD', { timeout: 3_000 })
   })
 
@@ -246,11 +246,11 @@ test.describe('Commands Work In All Profiles', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
     await page.click('[data-testid="emrg-confirm-btn"]')
 
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('EMERGENCY_LAND', { timeout: 3_000 })
   })
 
@@ -259,11 +259,11 @@ test.describe('Commands Work In All Profiles', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page)
 
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
     await page.click('[data-testid="emrg-confirm-btn"]')
 
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('EMERGENCY_LAND', { timeout: 3_000 })
   })
 
@@ -321,7 +321,7 @@ test.describe('Profile Switch Logged to Timeline', () => {
 
     await page.selectOption('[data-testid="mission-profile-select"]', 'ground')
 
-    await expect(page.locator('[data-testid="event-list"]'))
+    await expect(page.locator('[data-testid="event-list"]').first())
       .toContainText('GROUND', { timeout: 3_000 })
   })
 
@@ -330,7 +330,7 @@ test.describe('Profile Switch Logged to Timeline', () => {
 
     await page.selectOption('[data-testid="mission-profile-select"]', 'maritime')
 
-    await expect(page.locator('[data-testid="event-list"]'))
+    await expect(page.locator('[data-testid="event-list"]').first())
       .toContainText('MARITIME', { timeout: 3_000 })
   })
 
@@ -346,7 +346,7 @@ test.describe('Telemetry After Profile Switch', () => {
     await waitForTelemetry(page)
 
     // Telemetry panel should show SCOUT-1 callsign
-    await expect(page.locator('[data-testid="telemetry-panel"]'))
+    await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('SCOUT-1', { timeout: 5_000 })
   })
 
@@ -355,7 +355,7 @@ test.describe('Telemetry After Profile Switch', () => {
     await page.selectOption('[data-testid="mission-profile-select"]', 'ugv')
     await waitForTelemetry(page)
 
-    await expect(page.locator('[data-testid="telemetry-panel"]'))
+    await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('MULE-1', { timeout: 5_000 })
   })
 

@@ -24,7 +24,7 @@ test.describe('GCS Dashboard Rendering', () => {
     // "Interactive" = command console is visible and focusable
     // This is the main operator input — if it's ready, the UI is ready.
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 5_000 })
-    await page.focus('[data-testid="cmd-input"]')
+    await page.locator('[data-testid="cmd-input"]').first().focus()
 
     const elapsed = Date.now() - navigationStart
     // 5 000 ms budget — accounts for Next.js hydration, React 18 initial render,
@@ -46,7 +46,7 @@ test.describe('GCS Dashboard Rendering', () => {
     ]
 
     for (const selector of panels) {
-      await expect(page.locator(selector), `Panel not found: ${selector}`)
+      await expect(page.locator(selector).first(), `Panel not found: ${selector}`)
         .toBeVisible()
     }
   })
@@ -108,7 +108,7 @@ test.describe('GCS Dashboard Rendering', () => {
       '[data-testid="command-console"]',
       '[data-testid="mission-timeline"]',
     ]) {
-      await expect(page.locator(sel)).toBeInViewport()
+      await expect(page.locator(sel).first()).toBeInViewport()
     }
   })
 
@@ -117,8 +117,8 @@ test.describe('GCS Dashboard Rendering', () => {
     await gotoDemo(page)
 
     await expect(page.locator('[data-testid="gcs-header"]')).toBeVisible()
-    await expect(page.locator('[data-testid="telemetry-panel"]')).toBeVisible()
-    await expect(page.locator('[data-testid="command-console"]')).toBeVisible()
+    await expect(page.locator('[data-testid="telemetry-panel"]').first()).toBeVisible()
+    await expect(page.locator('[data-testid="command-console"]').first()).toBeVisible()
   })
 
   test('layout is stable at 1280×800', async ({ page }) => {

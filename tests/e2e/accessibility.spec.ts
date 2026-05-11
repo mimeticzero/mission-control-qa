@@ -88,7 +88,7 @@ test.describe('GCS Demo — WCAG AA', () => {
   test('telemetry panel has role=region with aria-label', async ({ page }) => {
     await gotoDemo(page)
     await waitForTelemetry(page)
-    const panel = page.locator('[data-testid="telemetry-panel"]')
+    const panel = page.locator('[data-testid="telemetry-panel"]').first()
     await expect(panel).toHaveAttribute('role', 'region')
     await expect(panel).toHaveAttribute('aria-label')
   })
@@ -96,21 +96,21 @@ test.describe('GCS Demo — WCAG AA', () => {
   test('datalink panel has role=region with aria-label', async ({ page }) => {
     await gotoDemo(page)
     await waitForTelemetry(page)
-    const panel = page.locator('[data-testid="datalink-status"]')
+    const panel = page.locator('[data-testid="datalink-status"]').first()
     await expect(panel).toHaveAttribute('role', 'region')
     await expect(panel).toHaveAttribute('aria-label')
   })
 
   test('command log has role=log for screen reader live announcements', async ({ page }) => {
     await gotoDemo(page)
-    await expect(page.locator('[data-testid="cmd-log"]')).toHaveAttribute('role', 'log')
-    await expect(page.locator('[data-testid="cmd-log"]')).toHaveAttribute('aria-live', 'polite')
+    await expect(page.locator('[data-testid="cmd-log"]').first()).toHaveAttribute('role', 'log')
+    await expect(page.locator('[data-testid="cmd-log"]').first()).toHaveAttribute('aria-live', 'polite')
   })
 
   test('event list has role=log for live mission updates', async ({ page }) => {
     await gotoDemo(page)
-    await expect(page.locator('[data-testid="event-list"]')).toHaveAttribute('role', 'log')
-    await expect(page.locator('[data-testid="event-list"]')).toHaveAttribute('aria-live', 'polite')
+    await expect(page.locator('[data-testid="event-list"]').first()).toHaveAttribute('role', 'log')
+    await expect(page.locator('[data-testid="event-list"]').first()).toHaveAttribute('aria-live', 'polite')
   })
 
   test('EMRG confirm dialog has role=alertdialog', async ({ page }) => {
@@ -128,7 +128,7 @@ test.describe('GCS Demo — WCAG AA', () => {
     await gotoDemo(page)
 
     // Focus the command input, then tab through the buttons
-    await page.focus('[data-testid="cmd-input"]')
+    await page.locator('[data-testid="cmd-input"]').first().focus()
 
     // Tab to navigate — all buttons should become focused at some point
     const buttons = [
@@ -140,7 +140,7 @@ test.describe('GCS Demo — WCAG AA', () => {
 
     for (const btn of buttons) {
       // Check the button is focusable (not disabled, has correct focus ring)
-      const button = page.locator(btn)
+      const button = page.locator(btn).first()
       await button.focus()
       await expect(button).toBeFocused()
     }
@@ -149,11 +149,11 @@ test.describe('GCS Demo — WCAG AA', () => {
   test('RTH can be triggered via keyboard (focus + Enter)', async ({ page }) => {
     await gotoDemo(page)
 
-    const rthBtn = page.locator('[data-testid="cmd-rth"]')
+    const rthBtn = page.locator('[data-testid="cmd-rth"]').first()
     await rthBtn.focus()
     await rthBtn.press('Enter')
 
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('RTH', { timeout: 2_000 })
   })
 
@@ -164,7 +164,7 @@ test.describe('GCS Demo — WCAG AA', () => {
     await page.keyboard.press('Tab')
     await page.keyboard.press('Tab')
     // The cmd-input should be reachable within a few tabs of the interactive area
-    const input = page.locator('[data-testid="cmd-input"]')
+    const input = page.locator('[data-testid="cmd-input"]').first()
     await input.focus()
     await expect(input).toBeFocused()
   })

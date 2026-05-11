@@ -136,7 +136,7 @@ test.describe('Telemetry Updates', () => {
 
     // The first event is the "GCS online" system message which appears immediately.
     // Now that we have a 5-drone fleet, the startup message uses "CDG perimeter patrol".
-    await expect(page.locator('[data-testid="event-list"]'))
+    await expect(page.locator('[data-testid="event-list"]').first())
       .toContainText('CDG perimeter patrol', { timeout: 5_000 })
   })
 
@@ -159,7 +159,7 @@ test.describe('Telemetry Updates', () => {
     await injectLowBattery(page)
 
     // Send a command that will generate a CRITICAL event
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
     await page.click('[data-testid="emrg-confirm-btn"]')
 
     // After ACK, a CRITICAL severity event (EMERGENCY_LAND) should appear

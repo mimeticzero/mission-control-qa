@@ -31,10 +31,10 @@ test.describe('Command Dispatch', () => {
     await page.waitForTimeout(1_600)
 
     // Click the RTH quick-action button
-    await page.click('[data-testid="cmd-rth"]')
+    await page.locator('[data-testid="cmd-rth"]').first().click()
 
     // The command log should immediately show the dispatch
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('RTH', { timeout: 2_000 })
 
     // Flight mode in header should update to RTH after ACK (~50-200ms simulated latency)
@@ -43,9 +43,9 @@ test.describe('Command Dispatch', () => {
   })
 
   test('RTH command appears in mission timeline', async ({ page }) => {
-    await page.click('[data-testid="cmd-rth"]')
+    await page.locator('[data-testid="cmd-rth"]').first().click()
 
-    await expect(page.locator('[data-testid="event-list"]'))
+    await expect(page.locator('[data-testid="event-list"]').first())
       .toContainText('RTH', { timeout: 5_000 })
   })
 
@@ -53,9 +53,9 @@ test.describe('Command Dispatch', () => {
 
   test('HOLD button dispatches command and changes flight mode', async ({ page }) => {
     await waitForTelemetry(page)
-    await page.click('[data-testid="cmd-hold"]')
+    await page.locator('[data-testid="cmd-hold"]').first().click()
 
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('HOLD', { timeout: 2_000 })
 
     await expect(page.locator('[data-testid="flight-mode"]'))
@@ -67,7 +67,7 @@ test.describe('Command Dispatch', () => {
   test('EMERGENCY_LAND requires confirmation dialog before executing', async ({ page }) => {
     await waitForTelemetry(page)
     // First click: arm the command (should NOT execute yet)
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
 
     // Confirmation dialog must appear
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
@@ -80,7 +80,7 @@ test.describe('Command Dispatch', () => {
   test('EMERGENCY_LAND executes after two-step confirmation', async ({ page }) => {
     await waitForTelemetry(page)
     // Step 1: arm
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
 
     // Step 2: confirm
@@ -90,7 +90,7 @@ test.describe('Command Dispatch', () => {
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).not.toBeVisible({ timeout: 2_000 })
 
     // Command should appear in log
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('EMERGENCY_LAND', { timeout: 3_000 })
 
     // Flight mode eventually reflects EMERGENCY_LAND after ACK
@@ -99,7 +99,7 @@ test.describe('Command Dispatch', () => {
   })
 
   test('EMERGENCY_LAND confirm dialog auto-cancels after 3 seconds', async ({ page }) => {
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
 
     // Wait for auto-cancel (3s + 500ms buffer)
@@ -109,13 +109,13 @@ test.describe('Command Dispatch', () => {
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).not.toBeVisible()
 
     // Console should note the auto-cancel
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('auto-cancelled', { timeout: 1_000 })
   })
 
   test('EMERGENCY_LAND can be cancelled via CANCEL button', async ({ page }) => {
     await waitForTelemetry(page)
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
 
     await page.click('[data-testid="emrg-cancel-btn"]')
@@ -129,32 +129,32 @@ test.describe('Command Dispatch', () => {
   // ── CLI terminal ─────────────────────────────────────────────────────────────
 
   test('operator can type and submit RTH via CLI', async ({ page }) => {
-    const input = page.locator('[data-testid="cmd-input"]')
+    const input = page.locator('[data-testid="cmd-input"]').first()
     await input.click()
     await input.fill('RTH')
     await input.press('Enter')
 
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('> RTH', { timeout: 2_000 })
   })
 
   test('unknown CLI command produces clear error message', async ({ page }) => {
-    const input = page.locator('[data-testid="cmd-input"]')
+    const input = page.locator('[data-testid="cmd-input"]').first()
     await input.click()
     await input.fill('LAUNCH_MISSILES')
     await input.press('Enter')
 
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('Unknown command', { timeout: 2_000 })
   })
 
   test('HELP command lists all available commands', async ({ page }) => {
-    const input = page.locator('[data-testid="cmd-input"]')
+    const input = page.locator('[data-testid="cmd-input"]').first()
     await input.click()
     await input.fill('HELP')
     await input.press('Enter')
 
-    const log = page.locator('[data-testid="cmd-log"]')
+    const log = page.locator('[data-testid="cmd-log"]').first()
     await expect(log).toContainText('RTH', { timeout: 2_000 })
     await expect(log).toContainText('HOLD')
     await expect(log).toContainText('EMERGENCY_LAND')
@@ -162,7 +162,7 @@ test.describe('Command Dispatch', () => {
   })
 
   test('CLI history is navigable with arrow keys', async ({ page }) => {
-    const input = page.locator('[data-testid="cmd-input"]')
+    const input = page.locator('[data-testid="cmd-input"]').first()
 
     // Submit two commands
     await input.click()
@@ -183,7 +183,7 @@ test.describe('Command Dispatch', () => {
   })
 
   test('command log persists multiple commands in session', async ({ page }) => {
-    const input = page.locator('[data-testid="cmd-input"]')
+    const input = page.locator('[data-testid="cmd-input"]').first()
 
     await input.click()
     await input.fill('RTH')
@@ -195,19 +195,19 @@ test.describe('Command Dispatch', () => {
     await page.waitForTimeout(200)
 
     // Both commands should be visible in the log
-    const log = page.locator('[data-testid="cmd-log"]')
+    const log = page.locator('[data-testid="cmd-log"]').first()
     await expect(log).toContainText('RTH')
     await expect(log).toContainText('HOLD')
   })
 
   test('STATUS command shows current drone state in log', async ({ page }) => {
     await waitForTelemetry(page)
-    const input = page.locator('[data-testid="cmd-input"]')
+    const input = page.locator('[data-testid="cmd-input"]').first()
     await input.click()
     await input.fill('STATUS')
     await input.press('Enter')
 
-    const log = page.locator('[data-testid="cmd-log"]')
+    const log = page.locator('[data-testid="cmd-log"]').first()
     await expect(log).toContainText('FALCON-1', { timeout: 2_000 })
     await expect(log).toContainText('BAT:')
   })

@@ -60,7 +60,7 @@ test.describe('Electronic Warfare Mode', () => {
   test('EW mode adds ew-active class to telemetry panel', async ({ page }) => {
     await gotoDemo(page)
 
-    const panel = page.locator('[data-testid="telemetry-panel"]')
+    const panel = page.locator('[data-testid="telemetry-panel"]').first()
 
     // Not active initially
     await expect(panel).not.toHaveClass(/ew-active/)
@@ -73,7 +73,7 @@ test.describe('Electronic Warfare Mode', () => {
   test('EW mode adds ew-active class to datalink panel', async ({ page }) => {
     await gotoDemo(page)
 
-    const panel = page.locator('[data-testid="datalink-status"]')
+    const panel = page.locator('[data-testid="datalink-status"]').first()
 
     await expect(panel).not.toHaveClass(/ew-active/)
 
@@ -95,7 +95,7 @@ test.describe('Electronic Warfare Mode', () => {
     await expect(page.locator('[data-testid="ew-mode-banner"]')).toBeVisible({ timeout: 2_000 })
 
     // Step 1: arm EMERGENCY_LAND
-    await page.click('[data-testid="cmd-emrg"]')
+    await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible({ timeout: 2_000 })
 
     // Measure from confirm click to log appearance
@@ -107,7 +107,7 @@ test.describe('Electronic Warfare Mode', () => {
     await page.click('[data-testid="emrg-confirm-btn"]')
 
     // Command must appear in log within 2 seconds of confirmation
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('EMERGENCY_LAND', { timeout: 2_000 })
 
     const elapsed = Date.now() - t0
@@ -119,7 +119,7 @@ test.describe('Electronic Warfare Mode', () => {
 
     await page.click('[data-testid="ew-mode-toggle"]')
 
-    await expect(page.locator('[data-testid="event-list"]'))
+    await expect(page.locator('[data-testid="event-list"]').first())
       .toContainText('EW Mode', { timeout: 3_000 })
   })
 
@@ -131,7 +131,7 @@ test.describe('Electronic Warfare Mode', () => {
     await page.waitForTimeout(300)
     await page.click('[data-testid="ew-mode-toggle"]')
 
-    await expect(page.locator('[data-testid="event-list"]'))
+    await expect(page.locator('[data-testid="event-list"]').first())
       .toContainText('restored to nominal', { timeout: 3_000 })
   })
 })
