@@ -14,7 +14,7 @@
 <!-- ![Mission Control GCS demo, 5-drone fleet, EW mode, C2 timeline](docs/demo.gif) -->
 
 [![CI](https://github.com/mimeticzero/mission-control-qa/actions/workflows/ci.yml/badge.svg)](https://github.com/mimeticzero/mission-control-qa/actions/workflows/ci.yml)
-[![Security Scan](https://github.com/mimeticzero/mission-control-qa/actions/workflows/security-scan.yml/badge.svg)](https://github.com/mimeticzero/mission-control-qa/actions/workflows/security-scan.yml)
+[![Security Scan](https://github.com/mimeticzero/mission-control-qa/actions/workflows/security.yml/badge.svg)](https://github.com/mimeticzero/mission-control-qa/actions/workflows/security.yml) [![ZAP Report](https://img.shields.io/badge/OWASP%20ZAP-0%20High%20%C2%B7%204%20Medium-brightgreen)](https://sakuranode.com/reports/mission-control-zap.html)
 
 ---
 
