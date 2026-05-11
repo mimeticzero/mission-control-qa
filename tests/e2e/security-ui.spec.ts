@@ -18,7 +18,10 @@ import { gotoDemo } from './helpers'
 
 test.describe('Security Headers', () => {
 
-  async function getHeaders(page: import('@playwright/test').Page, path = '/') {
+  // basePath is /mission-control — a leading-slash path resolves from the host
+  // origin, NOT from baseURL. Use full paths that include the basePath prefix so
+  // Next.js actually serves the request and applies the security headers config.
+  async function getHeaders(page: import('@playwright/test').Page, path = '/mission-control') {
     const response = await page.goto(path)
     if (!response) throw new Error(`No response for ${path}`)
     return response.headers()
@@ -64,14 +67,14 @@ test.describe('Security Headers', () => {
   })
 
   test('security headers are present on /demo as well as /', async ({ page }) => {
-    const headers = await getHeaders(page, '/demo')
+    const headers = await getHeaders(page, '/mission-control/demo')
     expect(headers['x-frame-options']).toBe('DENY')
     expect(headers['x-content-type-options']).toBe('nosniff')
     expect(headers['content-security-policy']).toBeTruthy()
   })
 
   test('security headers are present on API routes', async ({ page }) => {
-    const headers = await getHeaders(page, '/api/commands')
+    const headers = await getHeaders(page, '/mission-control/api/commands')
     expect(headers['x-frame-options']).toBe('DENY')
   })
 })
@@ -171,14 +174,15 @@ test.describe('Client-Side Injection', () => {
       if (msg.type() === 'error') consoleErrors.push(msg.text())
     })
 
-    const input = page.locator('[data-testid="cmd-input"]')
+    // .first() — CommandConsole renders in both desktop and mobile layouts
+    const input = page.locator('[data-testid="cmd-input"]').first()
     await input.click()
     // Attempt script injection via the CLI
     await input.fill('<SCRIPT>window.__injected=1</SCRIPT>')
     await input.press('Enter')
 
     // The input is uppercased and treated as a command string, not HTML
-    await expect(page.locator('[data-testid="cmd-log"]'))
+    await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('Unknown command', { timeout: 2_000 })
 
     // No injected global should exist

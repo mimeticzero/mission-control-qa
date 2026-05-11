@@ -182,7 +182,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
-    await expect(page.locator('[data-testid="battery-value"]'))
+    await expect(page.locator('[data-testid="battery-value"]').first())
       .toContainText('FUEL', { timeout: 3_000 })
   })
 
