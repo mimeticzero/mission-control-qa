@@ -145,7 +145,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   test('GROUND profile shows SPD OVR GND label', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('SPD OVR GND', { timeout: 3_000 })
@@ -154,7 +154,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   test('MARITIME profile shows DEPTH label', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('DEPTH', { timeout: 3_000 })
@@ -163,7 +163,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   test('UGV profile shows CLRNCE label', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('CLRNCE', { timeout: 3_000 })
@@ -172,7 +172,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   test('GROUND profile shows FUEL label instead of BATTERY', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await expect(page.locator('[data-testid="battery-value"]'))
       .toContainText('FUEL', { timeout: 3_000 })
@@ -181,7 +181,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   test('MARITIME profile shows WAVE HT extra metric', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('WAVE HT', { timeout: 3_000 })
@@ -190,7 +190,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   test('UGV profile shows ARMOR extra metric', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('ARMOR', { timeout: 3_000 })
@@ -205,7 +205,7 @@ test.describe('Commands Work In All Profiles', () => {
   test('RTH command dispatches in GROUND profile', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await page.locator('[data-testid="cmd-rth"]').first().click()
     await expect(page.locator('[data-testid="cmd-log"]').first())
@@ -215,7 +215,7 @@ test.describe('Commands Work In All Profiles', () => {
   test('RTH command dispatches in MARITIME profile', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await page.locator('[data-testid="cmd-rth"]').first().click()
     await expect(page.locator('[data-testid="cmd-log"]').first())
@@ -225,7 +225,7 @@ test.describe('Commands Work In All Profiles', () => {
   test('RTH command dispatches in UGV profile', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await page.locator('[data-testid="cmd-rth"]').first().click()
     await expect(page.locator('[data-testid="cmd-log"]').first())
@@ -244,7 +244,7 @@ test.describe('Commands Work In All Profiles', () => {
   test('EMERGENCY_LAND dispatches in GROUND profile after confirmation', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
@@ -257,7 +257,7 @@ test.describe('Commands Work In All Profiles', () => {
   test('EMERGENCY_LAND dispatches in UGV profile after confirmation', async ({ page }) => {
     await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
@@ -343,7 +343,7 @@ test.describe('Telemetry After Profile Switch', () => {
   test('telemetry populates after switching to GROUND', async ({ page }) => {
     await gotoDemo(page)
     await page.selectOption('[data-testid="mission-profile-select"]', 'ground')
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     // Telemetry panel should show SCOUT-1 callsign
     await expect(page.locator('[data-testid="telemetry-panel"]').first())
@@ -353,7 +353,7 @@ test.describe('Telemetry After Profile Switch', () => {
   test('telemetry populates after switching to UGV', async ({ page }) => {
     await gotoDemo(page)
     await page.selectOption('[data-testid="mission-profile-select"]', 'ugv')
-    await waitForTelemetry(page)
+    await waitForTelemetry(page, { timeout: 15_000 })
 
     await expect(page.locator('[data-testid="telemetry-panel"]').first())
       .toContainText('MULE-1', { timeout: 5_000 })

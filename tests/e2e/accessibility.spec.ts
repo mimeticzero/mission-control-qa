@@ -56,6 +56,7 @@ test.describe('Landing Page — WCAG AA', () => {
 test.describe('GCS Demo — WCAG AA', () => {
 
   test('no axe violations on /demo (map excluded — Leaflet managed accessibility)', async ({ page }) => {
+    test.setTimeout(40_000) // axe-core analysis is slow on webkit CI
     await gotoDemo(page)
     await waitForTelemetry(page)
 

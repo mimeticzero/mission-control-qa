@@ -46,29 +46,39 @@ test.describe('GCS Dashboard Rendering', () => {
     ]
 
     for (const selector of panels) {
-      await expect(page.locator(selector).first(), `Panel not found: ${selector}`)
-        .toBeVisible()
+      // map-view: mobile instance is first in DOM (md:hidden at desktop), desktop is nth(1)
+      const loc = selector === '[data-testid="map-view"]'
+        ? page.locator(selector).nth(1)
+        : page.locator(selector).first()
+      await expect(loc, `Panel not found: ${selector}`).toBeVisible()
     }
   })
 
   test('map container renders with Leaflet canvas', async ({ page }) => {
     await gotoDemo(page)
 
+    // Scope to the desktop map (nth(1)) — both mobile and desktop MapViews render
+    // Leaflet, so scoping avoids strict-mode failures from duplicate selectors.
+    const desktopMap = page.locator('[data-testid="map-view"]').nth(1)
+
     // Leaflet container element — this is the outermost div Leaflet manages
-    await expect(page.locator('.leaflet-container')).toBeVisible({ timeout: 10_000 })
+    await expect(desktopMap.locator('.leaflet-container')).toBeVisible({ timeout: 10_000 })
 
     // Leaflet internal panes are absolutely positioned inside an overflow:hidden
     // container, which causes Playwright's toBeVisible() to report them as hidden
     // even when they're rendering. Use toBeAttached() to confirm the DOM structure.
-    await expect(page.locator('.leaflet-tile-pane')).toBeAttached({ timeout: 10_000 })
-    await expect(page.locator('.leaflet-map-pane')).toBeAttached()
+    await expect(desktopMap.locator('.leaflet-tile-pane')).toBeAttached({ timeout: 10_000 })
+    await expect(desktopMap.locator('.leaflet-map-pane')).toBeAttached()
   })
 
   test('drone position is shown on the map', async ({ page }) => {
     await gotoDemo(page)
 
+    // Scope to the desktop map to avoid strict-mode failures from dual MapView instances
+    const desktopMap = page.locator('[data-testid="map-view"]').nth(1)
+
     // SVG overlay pane is present (Leaflet renders all vector layers here)
-    await expect(page.locator('.leaflet-overlay-pane')).toBeAttached({ timeout: 10_000 })
+    await expect(desktopMap.locator('.leaflet-overlay-pane')).toBeAttached({ timeout: 10_000 })
 
     // Leaflet renders CircleMarker, Circle, and Polyline as SVG <path> elements
     // (even "circles" use arc path data). Use waitForFunction to avoid Playwright
@@ -91,10 +101,11 @@ test.describe('GCS Dashboard Rendering', () => {
     await page.waitForSelector('[data-testid="flight-time"]')
 
     // Check that values are numeric strings (not placeholder text)
-    const altText = await page.locator('[data-testid="altitude-value"]').textContent()
+    // .first() — telemetry panels appear in both desktop and mobile layouts
+    const altText = await page.locator('[data-testid="altitude-value"]').first().textContent()
     expect(altText).toMatch(/\d+/)
 
-    const battText = await page.locator('[data-testid="battery-value"]').textContent()
+    const battText = await page.locator('[data-testid="battery-value"]').first().textContent()
     expect(battText).toMatch(/\d+\.\d+/)
   })
 
@@ -126,19 +137,21 @@ test.describe('GCS Dashboard Rendering', () => {
     await gotoDemo(page)
 
     await expect(page.locator('[data-testid="gcs-header"]')).toBeVisible()
-    await expect(page.locator('[data-testid="map-view"]')).toBeVisible()
+    // At 1280×800 the desktop layout is active; desktop map is nth(1)
+    await expect(page.locator('[data-testid="map-view"]').nth(1)).toBeVisible()
   })
 
   test('landing page renders with demo link', async ({ page }) => {
+    // / redirects to /qa — assert on what the QA page actually renders
     await page.goto('/')
-    await expect(page.getByRole('link', { name: /LAUNCH DEMO/i })).toBeVisible()
+    await expect(page.getByRole('link', { name: /^DEMO$/i })).toBeVisible()
     await expect(page).toHaveTitle(/Mission Control/)
   })
 
   test('docs page renders navigation and content sections', async ({ page }) => {
+    // /docs redirects to /qa — assert on QA page content
     await page.goto('/docs')
-    await expect(page.locator('a[href="#overview"]')).toBeVisible()
-    await expect(page.locator('a[href="#qa-roadmap"]')).toBeVisible()
-    await expect(page.locator('h1')).toContainText('Mission Control')
+    await expect(page.locator('h1')).toContainText('QA Results')
+    await expect(page).toHaveTitle(/Mission Control/)
   })
 })
