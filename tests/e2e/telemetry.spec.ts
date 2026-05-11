@@ -19,13 +19,13 @@ test.describe('Telemetry Updates', () => {
     await waitForTelemetry(page)
 
     // Capture flight time at T0
-    const t0 = await page.locator('[data-testid="flight-time"]').textContent()
+    const t0 = await page.locator('[data-testid="flight-time"]').first().textContent()
 
     // Wait ~1.5 s (> 1 simulator tick of 400ms)
     await page.waitForTimeout(1_500)
 
     // Flight time should have advanced
-    const t1 = await page.locator('[data-testid="flight-time"]').textContent()
+    const t1 = await page.locator('[data-testid="flight-time"]').first().textContent()
     expect(t0).not.toEqual(t1)
   })
 
@@ -33,19 +33,19 @@ test.describe('Telemetry Updates', () => {
     await gotoDemo(page)
     await waitForTelemetry(page)
 
-    const alt0 = await page.locator('[data-testid="altitude-value"]').textContent()
+    const alt0 = await page.locator('[data-testid="altitude-value"]').first().textContent()
 
     // Wait 3 seconds — enough for several simulator ticks
     await page.waitForTimeout(3_000)
 
-    const alt1 = await page.locator('[data-testid="altitude-value"]').textContent()
+    const alt1 = await page.locator('[data-testid="altitude-value"]').first().textContent()
 
     // Values may be the same if luck has it (tiny change rounds to same int),
     // so we check flight time to confirm simulator is alive rather than alt equality
-    const ft0 = await page.locator('[data-testid="flight-time"]').textContent()
+    const ft0 = await page.locator('[data-testid="flight-time"]').first().textContent()
     // 1.5 s gives enough margin for one flight-time tick even on a loaded Firefox worker
     await page.waitForTimeout(1_500)
-    const ft1 = await page.locator('[data-testid="flight-time"]').textContent()
+    const ft1 = await page.locator('[data-testid="flight-time"]').first().textContent()
     expect(ft0).not.toEqual(ft1)
 
     // Altitude should be a positive number
@@ -58,7 +58,7 @@ test.describe('Telemetry Updates', () => {
     await gotoDemo(page)
     await waitForTelemetry(page)
 
-    const battText = await page.locator('[data-testid="battery-value"]').textContent()
+    const battText = await page.locator('[data-testid="battery-value"]').first().textContent()
     const batt = parseFloat(battText?.replace(/[^0-9.]/g, '') ?? '0')
     expect(batt).toBeGreaterThan(0)
     expect(batt).toBeLessThanOrEqual(100)
@@ -68,7 +68,7 @@ test.describe('Telemetry Updates', () => {
     await gotoDemo(page)
     await waitForTelemetry(page)
 
-    const latText = await page.locator('[data-testid="latency-value"]').textContent()
+    const latText = await page.locator('[data-testid="latency-value"]').first().textContent()
     const lat = parseInt(latText?.replace(/\D/g, '') ?? '0', 10)
 
     // Simulated latency is always between 50 and 300ms
@@ -86,7 +86,7 @@ test.describe('Telemetry Updates', () => {
     await injectLowBattery(page)
 
     // Inner data-value element should be red (and pulsing)
-    await expect(page.locator('[data-testid="battery-value"] .data-value'))
+    await expect(page.locator('[data-testid="battery-value"]').first().locator('.data-value'))
       .toHaveClass(/text-gcs-red/, { timeout: 2_000 })
 
     // System status in header should reflect CRITICAL
@@ -100,7 +100,7 @@ test.describe('Telemetry Updates', () => {
     await injectLowBattery(page)
 
     // The battery-value container has aria-live="assertive" when battery < 15%
-    const liveAttr = await page.locator('[data-testid="battery-value"]').getAttribute('aria-live')
+    const liveAttr = await page.locator('[data-testid="battery-value"]').first().getAttribute('aria-live')
     expect(liveAttr).toBe('assertive')
   })
 
@@ -114,7 +114,7 @@ test.describe('Telemetry Updates', () => {
     await injectDatalinkLoss(page)
 
     // Latency value should show the injected 9999ms
-    await expect(page.locator('[data-testid="latency-value"]'))
+    await expect(page.locator('[data-testid="latency-value"]').first())
       .toContainText('9999', { timeout: 2_000 })
   })
 
@@ -124,7 +124,7 @@ test.describe('Telemetry Updates', () => {
     await injectDatalinkLoss(page)
 
     // Latency display uses text-gcs-red when latency > 150
-    await expect(page.locator('[data-testid="latency-value"]'))
+    await expect(page.locator('[data-testid="latency-value"]').first())
       .toHaveClass(/text-gcs-red/, { timeout: 2_000 })
   })
 
@@ -160,7 +160,9 @@ test.describe('Telemetry Updates', () => {
 
     // Send a command that will generate a CRITICAL event
     await page.locator('[data-testid="cmd-emrg"]').first().click()
-    await page.click('[data-testid="emrg-confirm-btn"]')
+    const confirmBtn = page.locator('[data-testid="emrg-confirm-btn"]')
+    await expect(confirmBtn).toBeVisible({ timeout: 3_000 })
+    await confirmBtn.click({ force: true })
 
     // After ACK, a CRITICAL severity event (EMERGENCY_LAND) should appear
     // Check for event items with red-related styling

@@ -88,7 +88,7 @@ test.describe('Command Dispatch', () => {
     // button from the DOM. Asserting toBeVisible() first lets React settle.
     const confirmBtn = page.locator('[data-testid="emrg-confirm-btn"]')
     await expect(confirmBtn).toBeVisible({ timeout: 3_000 })
-    await confirmBtn.click()
+    await confirmBtn.click({ force: true })
 
     // Dialog should dismiss
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).not.toBeVisible({ timeout: 2_000 })

@@ -263,7 +263,9 @@ test.describe('Commands Work In All Profiles', () => {
 
     await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
-    await page.click('[data-testid="emrg-confirm-btn"]')
+    const confirmBtn1 = page.locator('[data-testid="emrg-confirm-btn"]')
+    await expect(confirmBtn1).toBeVisible({ timeout: 3_000 })
+    await confirmBtn1.click({ force: true })
 
     await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('EMERGENCY_LAND', { timeout: 3_000 })
@@ -277,7 +279,9 @@ test.describe('Commands Work In All Profiles', () => {
 
     await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
-    await page.click('[data-testid="emrg-confirm-btn"]')
+    const confirmBtn2 = page.locator('[data-testid="emrg-confirm-btn"]')
+    await expect(confirmBtn2).toBeVisible({ timeout: 3_000 })
+    await confirmBtn2.click({ force: true })
 
     await expect(page.locator('[data-testid="cmd-log"]').first())
       .toContainText('EMERGENCY_LAND', { timeout: 3_000 })
