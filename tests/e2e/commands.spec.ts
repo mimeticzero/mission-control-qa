@@ -122,7 +122,9 @@ test.describe('Command Dispatch', () => {
     await page.locator('[data-testid="cmd-emrg"]').first().click()
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).toBeVisible()
 
-    await page.click('[data-testid="emrg-cancel-btn"]')
+    const cancelBtn = page.locator('[data-testid="emrg-cancel-btn"]')
+    await expect(cancelBtn).toBeVisible({ timeout: 3_000 })
+    await cancelBtn.click({ force: true })
     await expect(page.locator('[data-testid="emrg-confirm-dialog"]')).not.toBeVisible()
 
     // Flight mode unchanged

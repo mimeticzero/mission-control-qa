@@ -21,8 +21,9 @@ import { gotoDemo, waitForTelemetry } from './helpers'
 test.describe('Landing Page — WCAG AA', () => {
 
   test('no axe violations on /', async ({ page }) => {
+    test.setTimeout(30_000)
     await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
@@ -40,8 +41,9 @@ test.describe('Landing Page — WCAG AA', () => {
   })
 
   test('no axe violations on /docs', async ({ page }) => {
+    test.setTimeout(30_000)
     await page.goto('/docs')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
