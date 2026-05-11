@@ -94,7 +94,7 @@ test.describe('Profile Switching — Vehicle Names', () => {
 test.describe('URL Profile Parameter', () => {
 
   test('?profile=ground pre-selects GROUND profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await expect(page.locator('[data-testid="mission-profile-select"]')).toHaveValue('ground')
@@ -103,7 +103,7 @@ test.describe('URL Profile Parameter', () => {
   })
 
   test('?profile=maritime pre-selects MARITIME profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await expect(page.locator('[data-testid="mission-profile-select"]')).toHaveValue('maritime')
@@ -112,7 +112,7 @@ test.describe('URL Profile Parameter', () => {
   })
 
   test('?profile=ugv pre-selects UGV profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await expect(page.locator('[data-testid="mission-profile-select"]')).toHaveValue('ugv')
@@ -121,7 +121,7 @@ test.describe('URL Profile Parameter', () => {
   })
 
   test('invalid ?profile= value falls back to AERIAL', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=invalid', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=invalid', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await expect(page.locator('[data-testid="mission-profile-select"]')).toHaveValue('aerial')
@@ -143,7 +143,7 @@ test.describe('URL Profile Parameter', () => {
 test.describe('Profile-Specific Telemetry Labels', () => {
 
   test('GROUND profile shows SPD OVR GND label', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -152,7 +152,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   })
 
   test('MARITIME profile shows DEPTH label', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -161,7 +161,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   })
 
   test('UGV profile shows CLRNCE label', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -170,7 +170,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   })
 
   test('GROUND profile shows FUEL label instead of BATTERY', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -179,7 +179,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   })
 
   test('MARITIME profile shows WAVE HT extra metric', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -188,7 +188,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
   })
 
   test('UGV profile shows ARMOR extra metric', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -203,7 +203,7 @@ test.describe('Profile-Specific Telemetry Labels', () => {
 test.describe('Commands Work In All Profiles', () => {
 
   test('RTH command dispatches in GROUND profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -213,7 +213,7 @@ test.describe('Commands Work In All Profiles', () => {
   })
 
   test('RTH command dispatches in MARITIME profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -223,7 +223,7 @@ test.describe('Commands Work In All Profiles', () => {
   })
 
   test('RTH command dispatches in UGV profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -233,7 +233,7 @@ test.describe('Commands Work In All Profiles', () => {
   })
 
   test('HOLD command dispatches in MARITIME profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await page.locator('[data-testid="cmd-hold"]').first().click()
@@ -242,7 +242,7 @@ test.describe('Commands Work In All Profiles', () => {
   })
 
   test('EMERGENCY_LAND dispatches in GROUND profile after confirmation', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -255,7 +255,7 @@ test.describe('Commands Work In All Profiles', () => {
   })
 
   test('EMERGENCY_LAND dispatches in UGV profile after confirmation', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
     await waitForTelemetry(page, { timeout: 15_000 })
 
@@ -274,7 +274,7 @@ test.describe('Commands Work In All Profiles', () => {
 test.describe('EW Mode Works In All Profiles', () => {
 
   test('EW mode activates in GROUND profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ground', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await page.click('[data-testid="ew-mode-toggle"]')
@@ -283,7 +283,7 @@ test.describe('EW Mode Works In All Profiles', () => {
   })
 
   test('EW mode activates in MARITIME profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=maritime', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await page.click('[data-testid="ew-mode-toggle"]')
@@ -291,7 +291,7 @@ test.describe('EW Mode Works In All Profiles', () => {
   })
 
   test('EW mode activates in UGV profile', async ({ page }) => {
-    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'networkidle' })
+    await page.goto('/mission-control/demo?profile=ugv', { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="command-console"]', { timeout: 10_000 })
 
     await page.click('[data-testid="ew-mode-toggle"]')
