@@ -37,11 +37,12 @@ export const options = {
   },
 }
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000'
+const BASE_URL  = __ENV.BASE_URL || 'http://localhost:3000'
+const BASE_PATH = '/mission-control'
 
 export default function () {
   // Step 1: Simulate initial connection
-  const connect1 = http.get(`${BASE_URL}/api/telemetry`, {
+  const connect1 = http.get(`${BASE_URL}${BASE_PATH}/api/telemetry`, {
     headers: { 'Accept': 'text/event-stream' },
     timeout: '3s',
   })
@@ -54,7 +55,7 @@ export default function () {
   // Step 3: Reconnection attempt
   const reconnectStart = Date.now()
 
-  const connect2 = http.get(`${BASE_URL}/api/telemetry`, {
+  const connect2 = http.get(`${BASE_URL}${BASE_PATH}/api/telemetry`, {
     headers: { 'Accept': 'text/event-stream' },
     timeout: '3s',
   })

@@ -47,7 +47,8 @@ export const options = {
   },
 }
 
-const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000'
+const BASE_URL  = __ENV.BASE_URL || 'http://localhost:3000'
+const BASE_PATH = '/mission-control'
 
 export default function () {
   const start    = Date.now()
@@ -57,7 +58,7 @@ export default function () {
 
   // SSE is an HTTP GET with streaming response.
   // k6 reads the body stream; we parse event lines manually.
-  const response = http.get(`${BASE_URL}/api/telemetry`, {
+  const response = http.get(`${BASE_URL}${BASE_PATH}/api/telemetry`, {
     headers: {
       'Accept':        'text/event-stream',
       'Cache-Control': 'no-cache',

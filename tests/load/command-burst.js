@@ -46,6 +46,7 @@ export const options = {
 }
 
 const BASE_URL   = __ENV.BASE_URL || 'http://localhost:3000'
+const BASE_PATH  = '/mission-control'
 const COMMANDS   = ['RTH', 'HOLD', 'HOLD', 'HOLD']  // HOLD weighted higher (safer)
 
 export default function () {
@@ -58,7 +59,7 @@ export default function () {
 
   commandsSent.add(1)
 
-  const res = http.post(`${BASE_URL}/api/commands`, payload, params)
+  const res = http.post(`${BASE_URL}${BASE_PATH}/api/commands`, payload, params)
 
   const isPacketLoss = res.status === 504
   const isSuccess    = res.status === 200
