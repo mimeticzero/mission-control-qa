@@ -18,13 +18,12 @@ module.exports = {
   ci: {
     collect: {
       url: [
-        'http://localhost:3000/',
-        'http://localhost:3000/docs',
-        'http://localhost:3000/demo',
+        'http://localhost:3000/mission-control',
+        'http://localhost:3000/mission-control/docs',
+        'http://localhost:3000/mission-control/demo',
       ],
       numberOfRuns: 2,   // Average over 2 runs to reduce variance
-      startServerCommand: 'npm run start',
-      startServerReadyPattern: 'started server',
+      // No startServerCommand — the CI workflow manages the server lifecycle
       settings: {
         // Simulate a realistic desktop client (operators use workstations)
         formFactor: 'desktop',
