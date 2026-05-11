@@ -7,6 +7,10 @@ export async function gotoDemo(page: Page, { e2e = false } = {}) {
   // checking state — this is critical for the Next.js production build where
   // chunk loading happens asynchronously after the initial HTML.
   await page.goto(url, { waitUntil: 'networkidle' })
+  // Bring the page to the foreground. On webkit CI, background tabs have their
+  // timers (setInterval) aggressively throttled. bringToFront() ensures the
+  // 400 ms simulator interval runs at full speed throughout the test.
+  await page.bringToFront()
   // Wait for the command console to confirm the GCS UI is mounted and interactive.
   // We deliberately do NOT wait for telemetry here — tests that need actual
   // telemetry values must call waitForTelemetry() explicitly.

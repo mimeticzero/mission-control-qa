@@ -207,6 +207,14 @@ export default function DemoPage() {
     setActiveProfile(profile)
 
     const meta = MISSION_PROFILES[profile]
+
+    // Align selectedDroneId with the profile's first vehicle BEFORE the simulator
+    // starts emitting. Without this, non-aerial profiles load with selectedDroneId
+    // still set to 'DR-001' (the aerial default). batchUpdateFleet then finds no
+    // matching drone → telemetry alias stays null → "AWAITING TELEMETRY" forever.
+    // handleProfileChange already calls resetFleet; mirror that behaviour here.
+    resetFleet(meta.fleet[0].id)
+
     pushEvent({
       type:     'SYSTEM',
       message:  meta.missionStartMessage,
